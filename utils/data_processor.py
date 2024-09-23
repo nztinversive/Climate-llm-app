@@ -1,14 +1,9 @@
-import json
-import csv
-from io import StringIO
-from .advanced_models import (
-    linear_regression_temperature,
-    predict_temperature,
-    calculate_economic_impact,
-    monte_carlo_simulation,
-    calculate_risk_metrics
-)
 import numpy as np
+from sklearn.linear_model import LinearRegression
+from scipy.stats import norm
+import json
+from io import StringIO
+import csv
 
 def process_data(data):
     # Use the provided data or generate sample data if not available
@@ -47,7 +42,17 @@ def process_data(data):
     }
 
 def generate_scenarios(data, scenario_type='all'):
-    base_data = data['temperatureData']
+    if not data or 'temperatureData' not in data or not data['temperatureData']:
+        # Generate sample data if input is empty or invalid
+        base_data = [
+            {'year': 2020, 'temperature': 1.1},
+            {'year': 2030, 'temperature': 1.5},
+            {'year': 2040, 'temperature': 1.9},
+            {'year': 2050, 'temperature': 2.3}
+        ]
+    else:
+        base_data = data['temperatureData']
+    
     years = [entry['year'] for entry in base_data]
     base_temperatures = [entry['temperature'] for entry in base_data]
     
@@ -67,7 +72,11 @@ def generate_scenarios(data, scenario_type='all'):
         return {scenario_type: scenarios[scenario_type]}
 
 def perform_sensitivity_analysis(data, sensitivity_value=50):
-    base_economic_impact = data['economicData'][-1]['impact']
+    if not data or 'economicData' not in data or not data['economicData']:
+        # Generate sample data if input is empty or invalid
+        base_economic_impact = 0.05  # 5% impact as a default value
+    else:
+        base_economic_impact = data['economicData'][-1]['impact']
     
     sensitivities = {
         'temperature_sensitivity': (sensitivity_value / 100) * 2,
@@ -103,3 +112,38 @@ def export_data(data, format_type):
         return output.getvalue()
     else:
         raise ValueError(f"Unsupported format: {format_type}")
+
+def linear_regression_temperature(years, temperatures):
+    X = np.array(years).reshape(-1, 1)
+    y = np.array(temperatures)
+    model = LinearRegression()
+    model.fit(X, y)
+    return model
+
+def predict_temperature(model, year):
+    return model.predict([[year]])[0]
+
+def calculate_economic_impact(temperature_change):
+    # Assume 1°C increase leads to 1% GDP loss
+    gdp_impact = -0.01 * temperature_change
+    return gdp_impact
+
+def monte_carlo_simulation(num_simulations, base_temperature, volatility):
+    simulations = []
+    for _ in range(num_simulations):
+        annual_changes = norm.rvs(0, volatility, 30)  # Simulate 30 years
+        temperature_path = np.cumsum(annual_changes) + base_temperature
+        simulations.append(temperature_path)
+    return np.array(simulations)
+
+def calculate_risk_metrics(simulations):
+    final_temperatures = simulations[:, -1]
+    mean_temp = np.mean(final_temperatures)
+    var_95 = np.percentile(final_temperatures, 95)
+    max_temp = np.max(final_temperatures)
+    
+    return {
+        "mean_temperature": mean_temp,
+        "var_95": var_95,
+        "max_temperature": max_temp
+    }

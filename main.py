@@ -82,19 +82,23 @@ def api_advanced_analytics():
 
 @app.route('/api/update_scenario', methods=['POST'])
 def api_update_scenario():
-    data = request.json
-    scenario_type = data.get('scenario', 'baseline')
-    processed_data = process_data(data)
-    updated_scenario = generate_scenarios(processed_data, scenario_type)
-    return jsonify(updated_scenario)
+    try:
+        data = request.json
+        scenario_type = data.get('scenario', 'baseline')
+        updated_scenario = generate_scenarios(data, scenario_type)
+        return jsonify(updated_scenario)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
 
 @app.route('/api/update_sensitivity', methods=['POST'])
 def api_update_sensitivity():
-    data = request.json
-    sensitivity_value = data.get('sensitivity', 50)
-    processed_data = process_data(data)
-    updated_sensitivity = perform_sensitivity_analysis(processed_data, sensitivity_value)
-    return jsonify(updated_sensitivity)
+    try:
+        data = request.json
+        sensitivity_value = data.get('sensitivity', 50)
+        updated_sensitivity = perform_sensitivity_analysis(data, sensitivity_value)
+        return jsonify(updated_sensitivity)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
