@@ -1,0 +1,313 @@
+DOM fully loaded, about to load scripts
+app.js:2 DOM content loaded, setting up event listeners
+app.js:21 Window loaded, initializing application
+app.js:26 Initializing application
+app.js:31 Loading default data
+app.js:40 Default data received: {
+  "economicData": [
+    {
+      "gdp": 33.6,
+      "year": 2000
+    },
+    {
+      "gdp": 65.9,
+      "year": 2010
+    },
+    {
+      "gdp": 84.5,
+      "year": 2020
+    },
+    {
+      "gdp": 100,
+      "year": 2030
+    },
+    {
+      "gdp": -0.0002600000000000868,
+      "year": 2031
+    },
+    {
+      "gdp": -0.0006200000000001005,
+      "year": 2032
+    },
+    {
+      "gdp": -0.000979999999999972,
+      "year": 2033
+    },
+    {
+      "gdp": -0.0013399999999999857,
+      "year": 2034
+    },
+    {
+      "gdp": -0.0016999999999999993,
+      "year": 2035
+    },
+    {
+      "gdp": -0.0020600000000000128,
+      "year": 2036
+    },
+    {
+      "gdp": -0.0024200000000000267,
+      "year": 2037
+    },
+    {
+      "gdp": -0.0027800000000000403,
+      "year": 2038
+    },
+    {
+      "gdp": -0.0031400000000000538,
+      "year": 2039
+    },
+    {
+      "gdp": -0.0035000000000000677,
+      "year": 2040
+    },
+    {
+      "gdp": -0.0038600000000000812,
+      "year": 2041
+    },
+    {
+      "gdp": -0.004220000000000095,
+      "year": 2042
+    },
+    {
+      "gdp": -0.004579999999999966,
+      "year": 2043
+    },
+    {
+      "gdp": -0.00493999999999998,
+      "year": 2044
+    },
+    {
+      "gdp": -0.005299999999999994,
+      "year": 2045
+    },
+    {
+      "gdp": -0.005660000000000007,
+      "year": 2046
+    },
+    {
+      "gdp": -0.006020000000000021,
+      "year": 2047
+    },
+    {
+      "gdp": -0.006380000000000035,
+      "year": 2048
+    },
+    {
+      "gdp": -0.006740000000000048,
+      "year": 2049
+    },
+    {
+      "gdp": -0.007100000000000062,
+      "year": 2050
+    },
+    {
+      "gdp": -0.007460000000000076,
+      "year": 2051
+    },
+    {
+      "gdp": -0.007820000000000089,
+      "year": 2052
+    },
+    {
+      "gdp": -0.008180000000000102,
+      "year": 2053
+    },
+    {
+      "gdp": -0.008539999999999975,
+      "year": 2054
+    },
+    {
+      "gdp": -0.008899999999999988,
+      "year": 2055
+    },
+    {
+      "gdp": -0.009260000000000003,
+      "year": 2056
+    },
+    {
+      "gdp": -0.009620000000000016,
+      "year": 2057
+    },
+    {
+      "gdp": -0.009980000000000029,
+      "year": 2058
+    },
+    {
+      "gdp": -0.010340000000000042,
+      "year": 2059
+    },
+    {
+      "gdp": -0.010700000000000057,
+      "year": 2060
+    },
+    {
+      "gdp": -0.0003600000000000847,
+      "year": 2061
+    },
+    {
+      "gdp": -0.0007200000000000984,
+      "year": 2062
+    },
+    {
+      "gdp": -0.001080000000000112,
+      "year": 2063
+    },
+    {
+      "gdp": -0.0014400000000001256,
+      "year": 2064
+    },
+    {
+      "gdp": -0.0017999999999999971,
+      "year": 2065
+    },
+    {
+      "gdp": -0.002160000000000011,
+      "year": 2066
+    },
+    {
+      "gdp": -0.0025200000000000244,
+      "year": 2067
+    },
+    {
+      "gdp": -0.0028800000000000383,
+      "year": 2068
+    },
+    {
+      "gdp": -0.003240000000000052,
+      "year": 2069
+    },
+    {
+      "gdp": -0.0036000000000000654,
+      "year": 2070
+    },
+    {
+      "gdp": -0.003960000000000079,
+      "year": 2071
+    },
+    {
+      "gdp": -0.004320000000000093,
+      "year": 2072
+    },
+    {
+      "gdp": -0.004680000000000107,
+      "year": 2073
+    },
+    {
+      "gdp": -0.00504000000000012,
+      "year": 2074
+    },
+    {
+      "gdp": -0.005400000000000134,
+      "year": 2075
+    },
+    {
+      "gdp": -0.005760000000000006,
+      "year": 2076
+    },
+    {
+      "gdp": -0.006120000000000019,
+      "year": 2077
+    },
+    {
+      "gdp": -0.006480000000000033,
+      "year": 2078
+    },
+    {
+      "gdp": -0.0068400000000000466,
+      "year": 2079
+    },
+    {
+      "gdp": -0.00720000000000006,
+      "year": 2080
+    },
+    {
+      "gdp": -0.007560000000000074,
+      "year": 2081
+    },
+    {
+      "gdp": -0.007920000000000087,
+      "year": 2082
+    },
+    {
+      "gdp": -0.008280000000000102,
+      "year": 2083
+    },
+    {
+      "gdp": -0.008640000000000115,
+      "year": 2084
+    },
+    {
+      "gdp": -0.009000000000000128,
+      "year": 2085
+    },
+    {
+      "gdp": -0.009360000000000143,
+      "year": 2086
+    },
+    {
+      "gdp": -0.009720000000000013,
+      "year": 2087
+    },
+    {
+      "gdp": -0.010080000000000026,
+      "year": 2088
+    },
+    {
+      "gdp": -0.010440000000000041,
+      "year": 2089
+    },
+    {
+      "gdp": -0.010800000000000054,
+      "year": 2090
+    }
+  ],
+  "riskMetrics": {
+    "max_temperature": 18.69020604406755,
+    "mean_temperature": 16.968256322551696,
+    "var_95": 17.85565760990788
+  },
+  "scenarioData": {
+    "baseline": [
+      {
+        "temperature": 14.8,
+        "year": 2000
+      },
+      {
+        "temperature": 15.2,
+        "year": 2010
+      },
+      {
+        "temperature": 15.5,
+        "year": 2020
+      },
+      {
+        "temperature": 15.9,
+        "year": 2030
+      },
+      {
+        "temperature": 15.926000000000009,
+        "year": 2031
+      },
+      {
+        "temperature": 15.96200000000001,
+        "year": 2032
+      },
+      {
+        "temperature": 15.997999999999998,
+        "year": 
+app.js:41 Data structure: (5) ['economicData', 'riskMetrics', 'scenarioData', 'sensitivityData', 'temperatureData']
+app.js:51 Processing data: {economicData: Array(64), riskMetrics: {…}, scenarioData: {…}, sensitivityData: {…}, temperatureData: Array(64)}
+app.js:52  Set-Cookie header is ignored in response from url: https://7b42f20a-504d-49ea-a8fe-4e287ad0b061-00-3obcnir0ttsbn.spock.replit.dev/api/process_data. The combined size of the name and value must be less than or equal to 4096 characters.
+processData @ app.js:52
+(anonymous) @ app.js:42
+Promise.then
+loadDefaultData @ app.js:39
+initializeApplication @ app.js:27
+window.onload @ app.js:22
+load
+(anonymous) @ app.js:20
+app.js:66 Processed data received: {economicData: Array(94), riskMetrics: {…}, scenarioData: {…}, sensitivityData: {…}, temperatureData: Array(94)}
+charts.js:239 Updating charts with data: {economicData: Array(94), riskMetrics: {…}, scenarioData: {…}, sensitivityData: {…}, temperatureData: Array(94)}
+charts.js:251 All charts updated successfully
+app.js:171 Saving session data: {economicData: Array(94), riskMetrics: {…}, scenarioData: {…}, sensitivityData: {…}, temperatureData: Array(94)}

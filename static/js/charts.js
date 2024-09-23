@@ -85,6 +85,7 @@ function createChartWithRetry(chartId, createChartFunc, retryCount) {
 }
 
 function createTemperatureChart(data) {
+    console.log('Creating Temperature Chart');
     if (!data || !Array.isArray(data) || data.length === 0) {
         console.error('Invalid temperature data:', data);
         return;
@@ -114,6 +115,7 @@ function createTemperatureChart(data) {
 }
 
 function createEconomicChart(data) {
+    console.log('Creating Economic Chart');
     const ctx = document.getElementById('economicChart').getContext('2d');
     economicChart = new Chart(ctx, {
         type: 'bar',
@@ -138,6 +140,7 @@ function createEconomicChart(data) {
 }
 
 function createRiskChart(data) {
+    console.log('Creating Risk Chart');
     const ctx = document.getElementById('riskChart').getContext('2d');
     riskChart = new Chart(ctx, {
         type: 'radar',
@@ -168,6 +171,7 @@ function createRiskChart(data) {
 }
 
 function createScenarioChart(data) {
+    console.log('Creating Scenario Chart');
     const ctx = document.getElementById('scenarioChart').getContext('2d');
     const scenarios = Object.keys(data);
     const years = data[scenarios[0]].map(d => d.year);
@@ -198,6 +202,7 @@ function createScenarioChart(data) {
 }
 
 function createSensitivityChart(data) {
+    console.log('Creating Sensitivity Chart');
     const ctx = document.getElementById('sensitivityChart').getContext('2d');
     sensitivityChart = new Chart(ctx, {
         type: 'bar',
