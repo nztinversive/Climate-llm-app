@@ -27,24 +27,36 @@ function loadDefaultData() {
 }
 
 function createCharts(data) {
-    console.log('Creating charts with data:', data);
+    console.log('Creating charts with data:', JSON.stringify(data, null, 2));
     if (!data) {
         console.error('No data provided for chart creation');
         return;
     }
 
+    console.log('Creating Temperature Chart with data:', JSON.stringify(data.temperatureData, null, 2));
     createChartWithRetry('temperatureChart', () => createTemperatureChart(data.temperatureData), 0);
+    
+    console.log('Creating Economic Chart with data:', JSON.stringify(data.economicData, null, 2));
     createChartWithRetry('economicChart', () => createEconomicChart(data.economicData), 0);
+    
+    console.log('Creating Risk Chart with data:', JSON.stringify(data.riskMetrics, null, 2));
     createChartWithRetry('riskChart', () => createRiskChart(data.riskMetrics), 0);
+    
+    console.log('Creating Scenario Chart with data:', JSON.stringify(data.scenarioData, null, 2));
     createChartWithRetry('scenarioChart', () => createScenarioChart(data.scenarioData), 0);
+    
+    console.log('Creating Sensitivity Chart with data:', JSON.stringify(data.sensitivityData, null, 2));
     createChartWithRetry('sensitivityChart', () => createSensitivityChart(data.sensitivityData), 0);
 }
 
 function createChartWithRetry(chartId, createChartFunc, retryCount) {
     const canvas = document.getElementById(chartId);
+    console.log(`Attempting to create ${chartId}, retry count: ${retryCount}`);
     if (canvas && canvas.getContext) {
+        console.log(`Canvas element found for ${chartId}`);
         const ctx = canvas.getContext('2d');
         if (ctx) {
+            console.log(`Valid 2D context obtained for ${chartId}`);
             console.log(`Creating ${chartId}`);
             try {
                 createChartFunc(ctx);
@@ -61,11 +73,14 @@ function createChartWithRetry(chartId, createChartFunc, retryCount) {
         } else {
             console.error(`Unable to get 2D context for ${chartId}`);
         }
-    } else if (retryCount < MAX_RETRIES) {
-        console.log(`${chartId} element not found or doesn't support getContext. Retrying. Attempt ${retryCount + 1}`);
-        setTimeout(() => createChartWithRetry(chartId, createChartFunc, retryCount + 1), RETRY_DELAY);
     } else {
-        console.error(`${chartId} element not found or doesn't support getContext after ${MAX_RETRIES} attempts`);
+        console.error(`Canvas element not found for ${chartId}`);
+        if (retryCount < MAX_RETRIES) {
+            console.log(`${chartId} element not found or doesn't support getContext. Retrying. Attempt ${retryCount + 1}`);
+            setTimeout(() => createChartWithRetry(chartId, createChartFunc, retryCount + 1), RETRY_DELAY);
+        } else {
+            console.error(`${chartId} element not found or doesn't support getContext after ${MAX_RETRIES} attempts`);
+        }
     }
 }
 

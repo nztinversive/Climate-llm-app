@@ -37,7 +37,8 @@ function loadDefaultData() {
             return response.json();
         })
         .then(data => {
-            console.log('Default data received:', data);
+            console.log('Default data received:', JSON.stringify(data, null, 2));
+            console.log('Data structure:', Object.keys(data));
             processData(data);
         })
         .catch(error => {
