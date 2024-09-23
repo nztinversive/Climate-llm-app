@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Show loading state
-        llmResponseText.textContent = 'Thinking...';
+        llmResponseText.innerHTML = '<p class="text-gray-600">Thinking...</p>';
         llmResponse.classList.remove('hidden');
         llmQueryBtn.disabled = true;
         llmQueryBtn.textContent = 'Processing...';
@@ -33,17 +33,29 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .then(response => response.json())
         .then(data => {
-            llmResponseText.textContent = data.response;
+            llmResponseText.innerHTML = formatResponse(data.response);
             saveLLMResponse(query, data.response);
         })
         .catch(error => {
             console.error('Error performing LLM query:', error);
-            llmResponseText.textContent = 'Error processing your query. Please try again.';
+            llmResponseText.innerHTML = '<p class="text-red-600">Error processing your query. Please try again.</p>';
         })
         .finally(() => {
             llmQueryBtn.disabled = false;
             llmQueryBtn.textContent = 'Ask';
         });
+    }
+
+    function formatResponse(response) {
+        // Simple markdown-like parsing
+        return response
+            .replace(/\n\n/g, '</p><p>')
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            .replace(/- (.*)/g, '<li>$1</li>')
+            .replace(/<li>.*?<\/li>/g, match => `<ul>${match}</ul>`)
+            .replace(/\d+\. (.*)/g, '<li>$1</li>')
+            .replace(/<li>.*?<\/li>/g, match => `<ol>${match}</ol>`);
     }
 
     function saveLLMResponse(query, response) {

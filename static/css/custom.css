@@ -4,3 +4,47 @@
     height: 300px;
     width: 100%;
 }
+
+/* AI Response Styling */
+#llmResponseText {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #333;
+}
+
+#llmResponseText p {
+    margin-bottom: 1rem;
+}
+
+#llmResponseText strong {
+    font-weight: 600;
+    color: #2563eb;
+}
+
+#llmResponseText em {
+    font-style: italic;
+    color: #4b5563;
+}
+
+#llmResponseText ul, #llmResponseText ol {
+    margin-left: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+#llmResponseText li {
+    margin-bottom: 0.5rem;
+}
+
+#llmResponseText ul li::before {
+    content: "•";
+    color: #3B82F6;
+    font-weight: bold;
+    display: inline-block;
+    width: 1em;
+    margin-left: -1em;
+}
+
+#llmResponseText ol {
+    list-style-type: decimal;
+    padding-left: 1.5rem;
+}
