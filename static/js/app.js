@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sensitivitySlider = document.getElementById('sensitivitySlider');
 
     importBtn.addEventListener('click', () => fileInput.click());
+    // Implement importData function
     fileInput.addEventListener('change', importData);
     exportBtn.addEventListener('click', exportData);
     generateReportBtn.addEventListener('click', generateReport);
@@ -54,6 +55,54 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    function importData(event) {
+        const file = event.target.files[0];
+        if (!file) {
+            alert('Please select a file to import.');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const content = e.target.result;
+            let data;
+            
+            try {
+                if (file.name.endsWith('.json')) {
+                    data = JSON.parse(content);
+                } else if (file.name.endsWith('.csv')) {
+                    data = parseCSV(content);
+                } else {
+                    throw new Error('Unsupported file format. Please use JSON or CSV.');
+                }
+                processData(data);
+            } catch (error) {
+                console.error('Error parsing imported data:', error);
+                showErrorMessage('Error parsing imported data. Please check the file format.');
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    function parseCSV(content) {
+        const lines = content.split('\n');
+        const headers = lines[0].split(',');
+        const data = [];
+
+        for (let i = 1; i < lines.length; i++) {
+            const values = lines[i].split(',');
+            if (values.length === headers.length) {
+                const entry = {};
+                headers.forEach((header, index) => {
+                    entry[header.trim()] = values[index].trim();
+                });
+                data.push(entry);
+            }
+        }
+
+        return data;
+    }
+
     // Rest of the functions remain the same...
 });
 
@@ -61,7 +110,7 @@ function getLLMResponses() {
     return JSON.parse(localStorage.getItem('llmResponses') || '[]');
 }
 
-// Add these helper functions to get chart data
+// Helper functions to get chart data
 function getTemperatureData() {
     return temperatureChart ? temperatureChart.data.datasets[0].data.map((temp, index) => ({
         year: temperatureChart.data.labels[index],
