@@ -36,8 +36,15 @@ def api_get_default_data():
     if 'data' not in session:
         logging.info('Loading default data into session')
         session['data'] = load_default_data()
-    logging.info(f'Returning default data: {json.dumps(session["data"], indent=2)}')
-    return jsonify(session['data'])
+    data = session['data']
+    logging.info(f'Returning default data: {json.dumps(data, indent=2)}')
+    return jsonify({
+        'temperatureData': data.get('temperatureData', []),
+        'economicData': data.get('economicData', []),
+        'riskMetrics': data.get('riskMetrics', {}),
+        'scenarioData': data.get('scenarioData', {}),
+        'sensitivityData': data.get('sensitivityData', {})
+    })
 
 @app.route('/api/process_data', methods=['POST'])
 def api_process_data():
@@ -134,7 +141,12 @@ def api_advanced_analytics():
 @app.route('/api/update_scenario', methods=['POST'])
 def api_update_scenario():
     try:
-        data = request.json or session.get('data', {})
+        data = request.json
+        logging.info(f"Received scenario update request: {json.dumps(data, indent=2)}")
+
+        if not data:
+            return jsonify({'error': 'No data provided in the request'}), 400
+
         scenario_type = data.get('scenario', 'baseline')
         temperature_data = data.get('temperatureData')
         
@@ -142,6 +154,8 @@ def api_update_scenario():
             return jsonify({'error': 'No temperature data provided'}), 400
 
         updated_scenario = generate_scenarios({'temperatureData': temperature_data}, scenario_type)
+        logging.info(f"Generated updated scenario: {json.dumps(updated_scenario, indent=2)}")
+        
         return jsonify(updated_scenario)
     except Exception as e:
         logging.error(f"Error updating scenario: {str(e)}")
@@ -180,6 +194,37 @@ def api_update_sensitivity():
         logging.error(f"Unexpected error in update_sensitivity: {error_message}")
         logging.error(traceback.format_exc())
         return jsonify({'error': 'An unexpected error occurred', 'errorType': str(e.__class__.__name__)}), 500
+
+# Add these new imports
+from utils.nlg import generate_chart_summary
+from utils.scenario_comparison import compare_scenarios
+
+# Add these new routes
+@app.route('/api/generate_summary', methods=['POST'])
+def api_generate_summary():
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        
+        summary = generate_chart_summary(data)
+        return jsonify({'summary': summary})
+    except Exception as e:
+        logging.error(f"Error generating summary: {str(e)}")
+        return jsonify({'error': 'An error occurred while generating the summary'}), 500
+
+@app.route('/api/compare_scenarios', methods=['POST'])
+def api_compare_scenarios():
+    try:
+        data = request.json
+        if not data or 'scenarios' not in data:
+            return jsonify({'error': 'No scenario data provided'}), 400
+        
+        comparison = compare_scenarios(data['scenarios'])
+        return jsonify({'comparison': comparison})
+    except Exception as e:
+        logging.error(f"Error comparing scenarios: {str(e)}")
+        return jsonify({'error': 'An error occurred while comparing scenarios'}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

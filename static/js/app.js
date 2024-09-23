@@ -1,30 +1,63 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM content loaded, setting up event listeners');
-    const importBtn = document.getElementById('importBtn');
-    const exportBtn = document.getElementById('exportBtn');
-    const fileInput = document.getElementById('fileInput');
-    const generateReportBtn = document.getElementById('generateReportBtn');
-    const runAdvancedAnalyticsBtn = document.getElementById('runAdvancedAnalyticsBtn');
-    const scenarioSelect = document.getElementById('scenarioSelect');
-    const sensitivitySlider = document.getElementById('sensitivitySlider');
 
-    importBtn.addEventListener('click', () => fileInput.click());
-    fileInput.addEventListener('change', importData);
-    exportBtn.addEventListener('click', exportData);
-    generateReportBtn.addEventListener('click', generateReport);
-    runAdvancedAnalyticsBtn.addEventListener('click', runAdvancedAnalytics);
-    scenarioSelect.addEventListener('change', updateScenario);
-    sensitivitySlider.addEventListener('input', updateSensitivity);
-});
+    const elements = {
+        importBtn: document.getElementById('importBtn'),
+        exportBtn: document.getElementById('exportBtn'),
+        fileInput: document.getElementById('fileInput'),
+        generateReportBtn: document.getElementById('generateReportBtn'),
+        runAdvancedAnalyticsBtn: document.getElementById('runAdvancedAnalyticsBtn'),
+        scenarioSelect: document.getElementById('scenarioSelect'),
+        sensitivitySlider: document.getElementById('sensitivitySlider'),
+        generateSummaryBtn: document.getElementById('generateSummaryBtn'),
+        compareScenarioBtn: document.getElementById('compareScenarioBtn')
+    };
 
-window.onload = function() {
-    console.log('Window loaded, initializing application');
+    // Check if elements exist before adding event listeners
+    if (elements.importBtn && elements.fileInput) {
+        elements.importBtn.addEventListener('click', () => elements.fileInput.click());
+        elements.fileInput.addEventListener('change', importData);
+    }
+
+    if (elements.exportBtn) {
+        elements.exportBtn.addEventListener('click', exportData);
+    }
+
+    if (elements.generateReportBtn) {
+        elements.generateReportBtn.addEventListener('click', generateReport);
+    }
+
+    if (elements.runAdvancedAnalyticsBtn) {
+        elements.runAdvancedAnalyticsBtn.addEventListener('click', runAdvancedAnalytics);
+    }
+
+    if (elements.scenarioSelect) {
+        elements.scenarioSelect.addEventListener('change', handleScenarioChange);
+    }
+
+    if (elements.sensitivitySlider) {
+        elements.sensitivitySlider.addEventListener('input', handleSensitivityChange);
+    }
+
+    if (elements.generateSummaryBtn) {
+        elements.generateSummaryBtn.addEventListener('click', generateSummary);
+    }
+
+    if (elements.compareScenarioBtn) {
+        elements.compareScenarioBtn.addEventListener('click', compareScenarios);
+    }
+
     initializeApplication();
-};
+});
 
 function initializeApplication() {
     console.log('Initializing application');
-    loadDefaultData();
+    try {
+        initCharts();
+    } catch (error) {
+        console.error('Error initializing charts:', error);
+        showErrorMessage('Error initializing charts. Please try refreshing the page.');
+    }
 }
 
 function loadDefaultData() {
@@ -39,7 +72,13 @@ function loadDefaultData() {
         .then(data => {
             console.log('Default data received:', JSON.stringify(data, null, 2));
             console.log('Data structure:', Object.keys(data));
-            processData(data);
+            if (!data.temperatureData || !Array.isArray(data.temperatureData)) {
+                throw new Error('Invalid or missing temperature data in the response');
+            }
+            if (data.temperatureData.length === 0) {
+                throw new Error('Temperature data array is empty');
+            }
+            createCharts(data);
         })
         .catch(error => {
             console.error('Error loading default data:', error);
@@ -225,4 +264,16 @@ function getSensitivityData() {
         return data;
     }
     return {};
+}
+
+function handleScenarioChange(event) {
+    const selectedScenario = event.target.value;
+    console.log('Scenario changed to:', selectedScenario);
+    updateScenarioChart(selectedScenario);
+}
+
+function handleSensitivityChange(event) {
+    const sensitivityValue = event.target.value;
+    console.log('Sensitivity changed to:', sensitivityValue);
+    updateSensitivityChart(sensitivityValue);
 }

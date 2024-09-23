@@ -22,7 +22,47 @@ DEFAULT_DATA = {
 }
 
 def load_default_data():
-    return DEFAULT_DATA
+    # This is a placeholder. Replace with actual default data loading logic.
+    return {
+        'temperatureData': [
+            {'year': 2020, 'temperature': 14.5},
+            {'year': 2021, 'temperature': 14.6},
+            {'year': 2022, 'temperature': 14.7},
+        ],
+        'economicData': [
+            {'year': 2020, 'gdp': 84.54},
+            {'year': 2021, 'gdp': 94.58},
+            {'year': 2022, 'gdp': 100.36},
+        ],
+        'riskMetrics': {
+            'mean_temperature': 14.6,
+            'var_95': 15.2,
+            'max_temperature': 15.5
+        },
+        'scenarioData': {
+            'baseline': [
+                {'year': 2020, 'temperature': 14.5},
+                {'year': 2021, 'temperature': 14.6},
+                {'year': 2022, 'temperature': 14.7},
+            ],
+            'optimistic': [
+                {'year': 2020, 'temperature': 14.5},
+                {'year': 2021, 'temperature': 14.55},
+                {'year': 2022, 'temperature': 14.6},
+            ],
+            'pessimistic': [
+                {'year': 2020, 'temperature': 14.5},
+                {'year': 2021, 'temperature': 14.65},
+                {'year': 2022, 'temperature': 14.8},
+            ]
+        },
+        'sensitivityData': {
+            'GDP': 0.8,
+            'Population': 0.6,
+            'CO2 Emissions': 0.9,
+            'Renewable Energy': 0.7
+        }
+    }
 
 def process_data(data):
     if not data:

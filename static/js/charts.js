@@ -1,11 +1,4 @@
 let temperatureChart, economicChart, riskChart, scenarioChart, sensitivityChart;
-const MAX_RETRIES = 5;
-const RETRY_DELAY = 100; // milliseconds
-
-window.onload = function() {
-    console.log('Window loaded, initializing charts');
-    initCharts();
-};
 
 function initCharts() {
     console.log('Initializing charts');
@@ -15,9 +8,14 @@ function initCharts() {
 function loadDefaultData() {
     console.log('Loading default data');
     fetch('/api/get_default_data')
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
-            console.log('Default data received:', data);
+            console.log('Default data received:', JSON.stringify(data, null, 2));
             createCharts(data);
         })
         .catch(error => {
@@ -33,64 +31,43 @@ function createCharts(data) {
         return;
     }
 
-    console.log('Creating Temperature Chart with data:', JSON.stringify(data.temperatureData, null, 2));
-    createChartWithRetry('temperatureChart', () => createTemperatureChart(data.temperatureData), 0);
-    
-    console.log('Creating Economic Chart with data:', JSON.stringify(data.economicData, null, 2));
-    createChartWithRetry('economicChart', () => createEconomicChart(data.economicData), 0);
-    
-    console.log('Creating Risk Chart with data:', JSON.stringify(data.riskMetrics, null, 2));
-    createChartWithRetry('riskChart', () => createRiskChart(data.riskMetrics), 0);
-    
-    console.log('Creating Scenario Chart with data:', JSON.stringify(data.scenarioData, null, 2));
-    createChartWithRetry('scenarioChart', () => createScenarioChart(data.scenarioData), 0);
-    
-    console.log('Creating Sensitivity Chart with data:', JSON.stringify(data.sensitivityData, null, 2));
-    createChartWithRetry('sensitivityChart', () => createSensitivityChart(data.sensitivityData), 0);
+    createOrUpdateChart('temperatureChart', () => createTemperatureChart(data.temperatureData));
+    createOrUpdateChart('economicChart', () => createEconomicChart(data.economicData));
+    createOrUpdateChart('riskChart', () => createRiskChart(data.riskMetrics));
+    createOrUpdateChart('scenarioChart', () => createScenarioChart(data.scenarioData));
+    createOrUpdateChart('sensitivityChart', () => createSensitivityChart(data.sensitivityData));
 }
 
-function createChartWithRetry(chartId, createChartFunc, retryCount) {
-    const canvas = document.getElementById(chartId);
-    console.log(`Attempting to create ${chartId}, retry count: ${retryCount}`);
-    if (canvas && canvas.getContext) {
-        console.log(`Canvas element found for ${chartId}`);
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-            console.log(`Valid 2D context obtained for ${chartId}`);
-            console.log(`Creating ${chartId}`);
-            try {
-                createChartFunc(ctx);
-                console.log(`${chartId} created successfully`);
-            } catch (error) {
-                console.error(`Error creating ${chartId}:`, error);
-                if (retryCount < MAX_RETRIES) {
-                    console.log(`Retrying ${chartId} creation. Attempt ${retryCount + 1}`);
-                    setTimeout(() => createChartWithRetry(chartId, createChartFunc, retryCount + 1), RETRY_DELAY);
-                } else {
-                    console.error(`Failed to create ${chartId} after ${MAX_RETRIES} attempts`);
-                }
-            }
-        } else {
-            console.error(`Unable to get 2D context for ${chartId}`);
-        }
-    } else {
-        console.error(`Canvas element not found for ${chartId}`);
-        if (retryCount < MAX_RETRIES) {
-            console.log(`${chartId} element not found or doesn't support getContext. Retrying. Attempt ${retryCount + 1}`);
-            setTimeout(() => createChartWithRetry(chartId, createChartFunc, retryCount + 1), RETRY_DELAY);
-        } else {
-            console.error(`${chartId} element not found or doesn't support getContext after ${MAX_RETRIES} attempts`);
-        }
+function createOrUpdateChart(chartId, createChartFunction) {
+    const container = document.getElementById(chartId);
+    if (!container) {
+        console.error(`Container for ${chartId} not found`);
+        return;
+    }
+
+    // Clear the container
+    container.innerHTML = '';
+
+    // Create a new canvas element
+    const canvas = document.createElement('canvas');
+    canvas.id = `${chartId}Canvas`;
+    container.appendChild(canvas);
+
+    try {
+        createChartFunction();
+    } catch (error) {
+        console.error(`Error creating ${chartId}:`, error);
+        container.innerHTML = `<div class="error-message">Error creating chart. Please try refreshing the page.</div>`;
     }
 }
 
 function createTemperatureChart(data) {
-    console.log('Creating Temperature Chart');
+    console.log('Creating Temperature Chart with data:', JSON.stringify(data, null, 2));
     if (!data || !Array.isArray(data) || data.length === 0) {
-        console.error('Invalid temperature data:', data);
-        return;
+        throw new Error('Invalid temperature data');
     }
-    const ctx = document.getElementById('temperatureChart').getContext('2d');
+    
+    const ctx = document.getElementById('temperatureChartCanvas').getContext('2d');
     temperatureChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -116,7 +93,7 @@ function createTemperatureChart(data) {
 
 function createEconomicChart(data) {
     console.log('Creating Economic Chart');
-    const ctx = document.getElementById('economicChart').getContext('2d');
+    const ctx = document.getElementById('economicChartCanvas').getContext('2d');
     economicChart = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -141,7 +118,7 @@ function createEconomicChart(data) {
 
 function createRiskChart(data) {
     console.log('Creating Risk Chart');
-    const ctx = document.getElementById('riskChart').getContext('2d');
+    const ctx = document.getElementById('riskChartCanvas').getContext('2d');
     riskChart = new Chart(ctx, {
         type: 'radar',
         data: {
@@ -160,34 +137,25 @@ function createRiskChart(data) {
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false,
-            elements: {
-                line: {
-                    borderWidth: 3
-                }
-            }
+            maintainAspectRatio: false
         }
     });
 }
 
 function createScenarioChart(data) {
     console.log('Creating Scenario Chart');
-    const ctx = document.getElementById('scenarioChart').getContext('2d');
+    const ctx = document.getElementById('scenarioChartCanvas').getContext('2d');
     const scenarios = Object.keys(data);
-    const years = data[scenarios[0]].map(d => d.year);
-    
-    const datasets = scenarios.map(scenario => ({
-        label: scenario,
-        data: data[scenario].map(d => d.temperature),
-        borderColor: getScenarioColor(scenario),
-        fill: false
-    }));
-
     scenarioChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: years,
-            datasets: datasets
+            labels: data[scenarios[0]].map(d => d.year),
+            datasets: scenarios.map(scenario => ({
+                label: scenario,
+                data: data[scenario].map(d => d.temperature),
+                borderColor: getScenarioColor(scenario),
+                fill: false
+            }))
         },
         options: {
             responsive: true,
@@ -203,7 +171,7 @@ function createScenarioChart(data) {
 
 function createSensitivityChart(data) {
     console.log('Creating Sensitivity Chart');
-    const ctx = document.getElementById('sensitivityChart').getContext('2d');
+    const ctx = document.getElementById('sensitivityChartCanvas').getContext('2d');
     sensitivityChart = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -231,6 +199,20 @@ function createSensitivityChart(data) {
     });
 }
 
+function createTable(data, headers, rowDataFunction = null) {
+    let tableHTML = '<table class="w-full text-left border-collapse">';
+    tableHTML += '<thead><tr>' + headers.map(h => `<th class="p-2 border">${h}</th>`).join('') + '</tr></thead>';
+    tableHTML += '<tbody>';
+    
+    data.forEach(row => {
+        const rowData = rowDataFunction ? rowDataFunction(row) : row;
+        tableHTML += '<tr>' + rowData.map(cell => `<td class="p-2 border">${cell}</td>`).join('') + '</tr>';
+    });
+    
+    tableHTML += '</tbody></table>';
+    return tableHTML;
+}
+
 function getScenarioColor(scenario) {
     switch (scenario) {
         case 'baseline': return 'rgb(75, 192, 192)';
@@ -247,66 +229,176 @@ function updateCharts(data) {
         return;
     }
 
-    try {
-        updateTemperatureChart(data.temperatureData);
-        updateEconomicChart(data.economicData);
-        updateRiskChart(data.riskMetrics);
-        updateScenarioChart(data.scenarioData);
-        updateSensitivityChart(data.sensitivityData);
-        console.log('All charts updated successfully');
-    } catch (error) {
-        console.error('Error updating charts:', error);
-    }
-}
-
-function updateTemperatureChart(data) {
-    if (temperatureChart && data) {
-        temperatureChart.data.labels = data.map(d => d.year);
-        temperatureChart.data.datasets[0].data = data.map(d => d.temperature);
-        temperatureChart.update();
-    }
-}
-
-function updateEconomicChart(data) {
-    if (economicChart && data) {
-        economicChart.data.labels = data.map(d => d.year);
-        economicChart.data.datasets[0].data = data.map(d => d.gdp);
-        economicChart.update();
-    }
-}
-
-function updateRiskChart(data) {
-    if (riskChart && data) {
-        riskChart.data.datasets[0].data = [data.mean_temperature, data.var_95, data.max_temperature];
-        riskChart.update();
-    }
-}
-
-function updateScenarioChart(data) {
-    if (scenarioChart && data) {
-        const scenarios = Object.keys(data);
-        const years = data[scenarios[0]].map(d => d.year);
-        
-        scenarioChart.data.labels = years;
-        scenarioChart.data.datasets = scenarios.map(scenario => ({
-            label: scenario,
-            data: data[scenario].map(d => d.temperature),
-            borderColor: getScenarioColor(scenario),
-            fill: false
-        }));
-        scenarioChart.update();
-    }
-}
-
-function updateSensitivityChart(data) {
-    if (sensitivityChart && data) {
-        sensitivityChart.data.labels = Object.keys(data);
-        sensitivityChart.data.datasets[0].data = Object.values(data);
-        sensitivityChart.update();
-    }
+    createTemperatureChart(data.temperatureData);
+    createEconomicChart(data.economicData);
+    createRiskChart(data.riskMetrics);
+    createScenarioChart(data.scenarioData);
+    createSensitivityChart(data.sensitivityData);
 }
 
 function showErrorMessage(message) {
     console.error('Error:', message);
     alert(message);
+}
+
+function updateScenarioChart(scenarioType) {
+    console.log('Updating Scenario Chart for:', scenarioType);
+    fetch('/api/update_scenario', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+            scenario: scenarioType,
+            temperatureData: getTemperatureData()  // Add this line to send current temperature data
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Received scenario data:', data);
+        if (typeof data !== 'object' || data === null) {
+            throw new Error('Invalid data received from server');
+        }
+        
+        const scenarios = Object.keys(data);
+        if (scenarios.length === 0) {
+            throw new Error('No scenario data received');
+        }
+        
+        if (scenarioChart) {
+            scenarioChart.data.labels = data[scenarios[0]].map(d => d.year);
+            scenarioChart.data.datasets = scenarios.map(scenario => ({
+                label: scenario,
+                data: data[scenario].map(d => d.temperature),
+                borderColor: getScenarioColor(scenario),
+                fill: false
+            }));
+            scenarioChart.update();
+        } else {
+            createScenarioChart(data);
+        }
+    })
+    .catch(error => {
+        console.error('Error updating scenario chart:', error);
+        showErrorMessage('Error updating scenario. Please try again.');
+    });
+}
+
+function updateSensitivityChart(sensitivityValue) {
+    console.log('Updating Sensitivity Chart with value:', sensitivityValue);
+    // Get the current economic data from the economic chart
+    const economicData = getEconomicData();
+    
+    fetch('/api/update_sensitivity', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+            sensitivity: parseInt(sensitivityValue),
+            economicData: economicData
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (sensitivityChart) {
+            sensitivityChart.data.labels = Object.keys(data);
+            sensitivityChart.data.datasets[0].data = Object.values(data);
+            sensitivityChart.update();
+        } else {
+            createSensitivityChart(data);
+        }
+    })
+    .catch(error => {
+        console.error('Error updating sensitivity chart:', error);
+        showErrorMessage('Error updating sensitivity. Please try again.');
+    });
+}
+
+// Add this function to get economic data from the economic chart
+function getEconomicData() {
+    if (economicChart) {
+        return economicChart.data.labels.map((year, index) => ({
+            year: parseInt(year),
+            gdp: economicChart.data.datasets[0].data[index]
+        }));
+    }
+    return [];
+}
+
+// Add these new functions
+function generateSummary() {
+    const data = {
+        temperatureData: getTemperatureData(),
+        economicData: getEconomicData(),
+        riskMetrics: getRiskMetrics(),
+        scenarioData: getScenarioData(),
+        sensitivityData: getSensitivityData()
+    };
+
+    fetch('/api/generate_summary', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        document.getElementById('summaryText').textContent = result.summary;
+        document.getElementById('summarySection').classList.remove('hidden');
+    })
+    .catch(error => {
+        console.error('Error generating summary:', error);
+        showErrorMessage('Error generating summary. Please try again.');
+    });
+}
+
+function compareScenarios() {
+    const scenarioData = getScenarioData();
+
+    fetch('/api/compare_scenarios', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ scenarios: scenarioData })
+    })
+    .then(response => response.json())
+    .then(result => {
+        const comparisonTable = createComparisonTable(result.comparison);
+        document.getElementById('comparisonTableContainer').innerHTML = comparisonTable;
+        document.getElementById('comparisonSection').classList.remove('hidden');
+    })
+    .catch(error => {
+        console.error('Error comparing scenarios:', error);
+        showErrorMessage('Error comparing scenarios. Please try again.');
+    });
+}
+
+function createComparisonTable(data) {
+    let tableHTML = '<table class="w-full text-left border-collapse">';
+    
+    // Create header
+    const headers = Object.keys(data[0]);
+    tableHTML += '<thead><tr>' + headers.map(h => `<th class="p-2 border">${h}</th>`).join('') + '</tr></thead>';
+    
+    // Create rows
+    tableHTML += '<tbody>';
+    data.forEach(row => {
+        tableHTML += '<tr>' + headers.map(h => `<td class="p-2 border">${row[h]}</td>`).join('') + '</tr>';
+    });
+    tableHTML += '</tbody></table>';
+    
+    return tableHTML;
 }

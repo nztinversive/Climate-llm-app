@@ -19,6 +19,8 @@
     </script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Remove the Chart.js script -->
 </head>
 <body class="bg-gray-100">
     {% include 'components/header.html' %}
@@ -43,26 +45,42 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div class="bg-white p-6 rounded-lg shadow-lg">
                 <h2 class="text-2xl font-semibold mb-4 text-primary">Temperature Trends</h2>
-                <div id="temperatureChart" class="chart-container"></div>
+                <div id="temperatureChart" class="chart-container" style="height: 300px;"></div>
+                <div id="temperatureChartError" class="text-red-600 mt-2 hidden">Error loading chart. Please refresh the page.</div>
             </div>
             <div class="bg-white p-6 rounded-lg shadow-lg">
                 <h2 class="text-2xl font-semibold mb-4 text-primary">Economic Impact</h2>
-                <div id="economicChart" class="chart-container"></div>
+                <div id="economicChart" class="chart-container" style="height: 300px;"></div>
+                <div id="economicChartError" class="text-red-600 mt-2 hidden">Error loading chart. Please refresh the page.</div>
             </div>
             <div class="bg-white p-6 rounded-lg shadow-lg">
                 <h2 class="text-2xl font-semibold mb-4 text-primary">Risk Assessment</h2>
-                <div id="riskChart" class="chart-container"></div>
+                <div id="riskChart" class="chart-container" style="height: 300px;"></div>
+                <div id="riskChartError" class="text-red-600 mt-2 hidden">Error loading chart. Please refresh the page.</div>
             </div>
             <div class="bg-white p-6 rounded-lg shadow-lg">
                 <h2 class="text-2xl font-semibold mb-4 text-primary">Temperature Scenarios</h2>
-                <div id="scenarioChart" class="chart-container"></div>
+                <div id="scenarioChart" class="chart-container" style="height: 300px;"></div>
+                <div id="scenarioChartError" class="text-red-600 mt-2 hidden">Error loading chart. Please refresh the page.</div>
             </div>
             <div class="bg-white p-6 rounded-lg shadow-lg">
                 <h2 class="text-2xl font-semibold mb-4 text-primary">Economic Sensitivity</h2>
-                <div id="sensitivityChart" class="chart-container"></div>
+                <div id="sensitivityChart" class="chart-container" style="height: 300px;"></div>
+                <div id="sensitivityChartError" class="text-red-600 mt-2 hidden">Error loading chart. Please refresh the page.</div>
             </div>
         </div>
         
+        <!-- Add this after the chart containers and before the controls section -->
+        <div id="summarySection" class="mt-8 bg-white p-6 rounded-lg shadow-lg hidden">
+            <h2 class="text-2xl font-semibold mb-4 text-primary">Data Summary</h2>
+            <p id="summaryText" class="whitespace-pre-line"></p>
+        </div>
+
+        <div id="comparisonSection" class="mt-8 bg-white p-6 rounded-lg shadow-lg hidden">
+            <h2 class="text-2xl font-semibold mb-4 text-primary">Scenario Comparison</h2>
+            <div id="comparisonTableContainer"></div>
+        </div>
+
         <!-- Controls Section -->
         <div class="mt-8 bg-white p-6 rounded-lg shadow-lg">
             <h2 class="text-2xl font-semibold mb-4 text-primary">Controls</h2>
@@ -71,6 +89,8 @@
                 <button id="exportBtn" class="bg-primary text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">Export Data</button>
                 <button id="generateReportBtn" class="bg-primary text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">Generate Report</button>
                 <button id="runAdvancedAnalyticsBtn" class="bg-primary text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">Run Advanced Analytics</button>
+                <button id="generateSummaryBtn" class="bg-primary text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">Generate Summary</button>
+                <button id="compareScenarioBtn" class="bg-primary text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">Compare Scenarios</button>
             </div>
             <div class="mt-4">
                 <label for="scenarioSelect" class="block text-sm font-medium text-gray-700">Select Scenario:</label>
@@ -93,12 +113,19 @@
     <script>
         console.log('DOM fully loaded, about to load scripts');
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
     <script src="{{ url_for('static', filename='js/llm.js') }}"></script>
     <script>
         console.log('All scripts loaded');
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOMContentLoaded event fired');
+            if (typeof initCharts === 'function') {
+                initCharts();
+            } else {
+                console.error('initCharts function not found');
+            }
+        });
     </script>
 </body>
 </html>
