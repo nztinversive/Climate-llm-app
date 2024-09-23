@@ -2,10 +2,10 @@ let temperatureChart, economicChart, riskChart, scenarioChart, sensitivityChart;
 const MAX_RETRIES = 5;
 const RETRY_DELAY = 100; // milliseconds
 
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM content loaded, initializing charts');
+window.onload = function() {
+    console.log('Window loaded, initializing charts');
     initCharts();
-});
+};
 
 function initCharts() {
     console.log('Initializing charts');
@@ -42,7 +42,7 @@ function createCharts(data) {
 
 function createChartWithRetry(chartId, createChartFunc, retryCount) {
     const canvas = document.getElementById(chartId);
-    if (canvas) {
+    if (canvas && canvas.getContext) {
         const ctx = canvas.getContext('2d');
         if (ctx) {
             console.log(`Creating ${chartId}`);
@@ -62,10 +62,10 @@ function createChartWithRetry(chartId, createChartFunc, retryCount) {
             console.error(`Unable to get 2D context for ${chartId}`);
         }
     } else if (retryCount < MAX_RETRIES) {
-        console.log(`${chartId} element not found. Retrying. Attempt ${retryCount + 1}`);
+        console.log(`${chartId} element not found or doesn't support getContext. Retrying. Attempt ${retryCount + 1}`);
         setTimeout(() => createChartWithRetry(chartId, createChartFunc, retryCount + 1), RETRY_DELAY);
     } else {
-        console.error(`${chartId} element not found after ${MAX_RETRIES} attempts`);
+        console.error(`${chartId} element not found or doesn't support getContext after ${MAX_RETRIES} attempts`);
     }
 }
 

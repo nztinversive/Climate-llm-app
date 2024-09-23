@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM content loaded, initializing application');
+    console.log('DOM content loaded, setting up event listeners');
     const importBtn = document.getElementById('importBtn');
     const exportBtn = document.getElementById('exportBtn');
     const fileInput = document.getElementById('fileInput');
@@ -15,158 +15,161 @@ document.addEventListener('DOMContentLoaded', () => {
     runAdvancedAnalyticsBtn.addEventListener('click', runAdvancedAnalytics);
     scenarioSelect.addEventListener('change', updateScenario);
     sensitivitySlider.addEventListener('input', updateSensitivity);
+});
 
+window.onload = function() {
+    console.log('Window loaded, initializing application');
     initializeApplication();
+};
 
-    function initializeApplication() {
-        console.log('Initializing application');
-        loadDefaultData();
-    }
+function initializeApplication() {
+    console.log('Initializing application');
+    loadDefaultData();
+}
 
-    function loadDefaultData() {
-        console.log('Loading default data');
-        fetch('/api/get_default_data')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Default data received:', data);
-                processData(data);
-            })
-            .catch(error => {
-                console.error('Error loading default data:', error);
-                showErrorMessage('Error loading default data. Please try refreshing the page.');
-            });
-    }
-
-    function processData(data) {
-        console.log('Processing data:', data);
-        fetch('/api/process_data', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
+function loadDefaultData() {
+    console.log('Loading default data');
+    fetch('/api/get_default_data')
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             return response.json();
         })
-        .then(processedData => {
-            console.log('Processed data received:', processedData);
-            updateCharts(processedData);
-            saveSession(processedData);
+        .then(data => {
+            console.log('Default data received:', data);
+            processData(data);
         })
         .catch(error => {
-            console.error('Error processing data:', error);
-            showErrorMessage('Error processing data. Please try again.');
+            console.error('Error loading default data:', error);
+            showErrorMessage('Error loading default data. Please try refreshing the page.');
         });
-    }
+}
 
-    function importData(event) {
-        const file = event.target.files[0];
-        if (!file) {
-            alert('Please select a file to import.');
-            return;
+function processData(data) {
+    console.log('Processing data:', data);
+    fetch('/api/process_data', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
+        return response.json();
+    })
+    .then(processedData => {
+        console.log('Processed data received:', processedData);
+        updateCharts(processedData);
+        saveSession(processedData);
+    })
+    .catch(error => {
+        console.error('Error processing data:', error);
+        showErrorMessage('Error processing data. Please try again.');
+    });
+}
 
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const content = e.target.result;
-            let data;
-            
-            try {
-                if (file.name.endsWith('.json')) {
-                    data = JSON.parse(content);
-                } else if (file.name.endsWith('.csv')) {
-                    data = parseCSV(content);
-                } else {
-                    throw new Error('Unsupported file format. Please use JSON or CSV.');
-                }
-                processData(data);
-            } catch (error) {
-                console.error('Error parsing imported data:', error);
-                showErrorMessage('Error parsing imported data. Please check the file format.');
-            }
-        };
-        reader.readAsText(file);
+function importData(event) {
+    const file = event.target.files[0];
+    if (!file) {
+        alert('Please select a file to import.');
+        return;
     }
 
-    function exportData() {
-        const data = {
-            temperatureData: getTemperatureData(),
-            economicData: getEconomicData(),
-            riskMetrics: getRiskMetrics(),
-            scenarioData: getScenarioData(),
-            sensitivityData: getSensitivityData()
-        };
-
-        const jsonData = JSON.stringify(data, null, 2);
-        const blob = new Blob([jsonData], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'climate_economic_data.json';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    }
-
-    function parseCSV(content) {
-        const lines = content.split('\n');
-        const headers = lines[0].split(',');
-        const data = [];
-
-        for (let i = 1; i < lines.length; i++) {
-            const values = lines[i].split(',');
-            if (values.length === headers.length) {
-                const entry = {};
-                headers.forEach((header, index) => {
-                    entry[header.trim()] = values[index].trim();
-                });
-                data.push(entry);
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const content = e.target.result;
+        let data;
+        
+        try {
+            if (file.name.endsWith('.json')) {
+                data = JSON.parse(content);
+            } else if (file.name.endsWith('.csv')) {
+                data = parseCSV(content);
+            } else {
+                throw new Error('Unsupported file format. Please use JSON or CSV.');
             }
+            processData(data);
+        } catch (error) {
+            console.error('Error parsing imported data:', error);
+            showErrorMessage('Error parsing imported data. Please check the file format.');
         }
+    };
+    reader.readAsText(file);
+}
 
-        return data;
+function exportData() {
+    const data = {
+        temperatureData: getTemperatureData(),
+        economicData: getEconomicData(),
+        riskMetrics: getRiskMetrics(),
+        scenarioData: getScenarioData(),
+        sensitivityData: getSensitivityData()
+    };
+
+    const jsonData = JSON.stringify(data, null, 2);
+    const blob = new Blob([jsonData], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'climate_economic_data.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+function parseCSV(content) {
+    const lines = content.split('\n');
+    const headers = lines[0].split(',');
+    const data = [];
+
+    for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',');
+        if (values.length === headers.length) {
+            const entry = {};
+            headers.forEach((header, index) => {
+                entry[header.trim()] = values[index].trim();
+            });
+            data.push(entry);
+        }
     }
 
-    function generateReport() {
-        console.log('Generating report...');
-        alert('Report generated! This is a placeholder.');
-    }
+    return data;
+}
 
-    function runAdvancedAnalytics() {
-        console.log('Running advanced analytics...');
-        alert('Advanced analytics completed! This is a placeholder.');
-    }
+function generateReport() {
+    console.log('Generating report...');
+    alert('Report generated! This is a placeholder.');
+}
 
-    function updateScenario() {
-        console.log('Updating scenario...');
-        alert('Scenario updated! This is a placeholder.');
-    }
+function runAdvancedAnalytics() {
+    console.log('Running advanced analytics...');
+    alert('Advanced analytics completed! This is a placeholder.');
+}
 
-    function updateSensitivity() {
-        console.log('Updating sensitivity...');
-        alert('Sensitivity updated! This is a placeholder.');
-    }
+function updateScenario() {
+    console.log('Updating scenario...');
+    alert('Scenario updated! This is a placeholder.');
+}
 
-    function showErrorMessage(message) {
-        console.error('Error:', message);
-        alert(message);
-    }
+function updateSensitivity() {
+    console.log('Updating sensitivity...');
+    alert('Sensitivity updated! This is a placeholder.');
+}
 
-    function saveSession(data) {
-        console.log('Saving session data:', data);
-        // Implement session saving logic here
-    }
-});
+function showErrorMessage(message) {
+    console.error('Error:', message);
+    alert(message);
+}
+
+function saveSession(data) {
+    console.log('Saving session data:', data);
+    // Implement session saving logic here
+}
 
 function getLLMResponses() {
     return JSON.parse(localStorage.getItem('llmResponses') || '[]');
