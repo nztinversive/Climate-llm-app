@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Climate Economic Modeling Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563EB',
+                        secondary: '#10B981',
+                        background: '#F9FAFB',
+                        card: '#FFFFFF',
+                        text: '#1F2937',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+</head>
+<body class="bg-background text-text">
+    {% include 'components/header.html' %}
+
+    <main>
+        <section class="bg-gradient-to-r from-primary to-secondary text-white py-20">
+            <div class="container mx-auto px-4">
+                <h1 class="text-5xl font-bold mb-4">Climate Economic Modeling Tool</h1>
+                <p class="text-xl mb-8">Explore the complex relationships between climate change and economic factors with our advanced modeling tool.</p>
+                <a href="/dashboard" class="bg-white text-primary font-bold py-3 px-6 rounded-lg hover:bg-gray-100 transition duration-300">Launch Dashboard</a>
+            </div>
+        </section>
+
+        <section class="py-16">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold mb-8 text-center">Key Features</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <i class="fas fa-chart-line text-4xl text-primary mb-4"></i>
+                        <h3 class="text-xl font-semibold mb-2">Advanced Analytics</h3>
+                        <p>Utilize cutting-edge algorithms to analyze climate and economic data.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <i class="fas fa-robot text-4xl text-primary mb-4"></i>
+                        <h3 class="text-xl font-semibold mb-2">AI-Powered Insights</h3>
+                        <p>Get intelligent answers to your climate economics questions.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <i class="fas fa-sync-alt text-4xl text-primary mb-4"></i>
+                        <h3 class="text-xl font-semibold mb-2">Real-time Simulations</h3>
+                        <p>Experience dynamic updates and scenario modeling in real-time.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    {% include 'components/footer.html' with context %}
+</body>
+</html>

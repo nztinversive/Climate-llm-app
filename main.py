@@ -17,8 +17,12 @@ db = ReplitDB()
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 @app.route('/')
-def index():
-    logging.info('Index route accessed')
+def landing():
+    return render_template('landing.html')
+
+@app.route('/dashboard')
+def dashboard():
+    logging.info('Dashboard route accessed')
     if 'data' not in session:
         logging.info('Loading default data into session')
         session['data'] = load_default_data()
