@@ -180,18 +180,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        const validEconomicData = economicData.filter(data => {
-            return (data.gdp !== undefined && data.gdp !== null) || (data.impact !== undefined && data.impact !== null);
-        });
-        
-        if (validEconomicData.length === 0) {
-            console.error('No valid GDP or impact values found in economic data');
-            showErrorMessage('No valid GDP or impact values found in economic data');
-            return;
-        }
-        
         const data = {
-            economicData: validEconomicData,
+            economicData: economicData,
             sensitivity: sensitivityValue
         };
 

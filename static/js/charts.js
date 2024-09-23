@@ -207,7 +207,6 @@ function updateScenarioChart(scenarioData) {
         scenarioChart.data.labels = years;
         scenarioChart.data.datasets[0].data = temperatures;
 
-        // Update other scenarios if available
         if (scenarioData.optimistic && Array.isArray(scenarioData.optimistic)) {
             scenarioChart.data.datasets[1].data = scenarioData.optimistic.map(d => d.temperature);
         }
@@ -224,8 +223,11 @@ function updateScenarioChart(scenarioData) {
 }
 
 function updateSensitivityChart(sensitivityData) {
+    console.log('Updating sensitivity chart with data:', sensitivityData);
+
     if (!sensitivityData || typeof sensitivityData !== 'object') {
         console.error('Invalid sensitivity data:', sensitivityData);
+        showErrorMessage('Invalid sensitivity data received');
         return;
     }
 
@@ -236,11 +238,29 @@ function updateSensitivityChart(sensitivityData) {
         sensitivityData.technology_sensitivity
     ];
 
-    sensitivityChart.data.datasets[0].data = data;
+    const labels = [
+        'Temperature Change',
+        'Economic Growth',
+        'Adaptation Measures',
+        'Technology Advancement'
+    ];
 
-    if (sensitivityData.labels && Array.isArray(sensitivityData.labels)) {
-        sensitivityChart.data.labels = sensitivityData.labels;
-    }
+    const backgroundColors = [
+        'rgba(255, 99, 132, 0.6)',
+        'rgba(54, 162, 235, 0.6)',
+        'rgba(255, 206, 86, 0.6)',
+        'rgba(75, 192, 192, 0.6)'
+    ];
+
+    sensitivityChart.data.labels = labels;
+    sensitivityChart.data.datasets[0].data = data;
+    sensitivityChart.data.datasets[0].backgroundColor = backgroundColors;
+
+    sensitivityChart.options.scales.y.beginAtZero = true;
+    sensitivityChart.options.scales.y.title = {
+        display: true,
+        text: 'Sensitivity Impact'
+    };
 
     sensitivityChart.update();
 

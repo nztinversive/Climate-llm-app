@@ -81,10 +81,10 @@ def perform_sensitivity_analysis(data, sensitivity_value=50):
     if not data or 'economicData' not in data or not data['economicData']:
         logging.warning("No economic data provided for sensitivity analysis")
         return {
-            'temperature_sensitivity': 0,
-            'economic_growth_sensitivity': 0,
-            'adaptation_sensitivity': 0,
-            'technology_sensitivity': 0
+            'temperature_sensitivity': 0.1,
+            'economic_growth_sensitivity': 0.1,
+            'adaptation_sensitivity': 0.1,
+            'technology_sensitivity': 0.1
         }
     
     try:
@@ -100,25 +100,25 @@ def perform_sensitivity_analysis(data, sensitivity_value=50):
         
         logging.info(f"Base economic value for sensitivity analysis: {base_economic_value}")
         
+        sensitivity_factor = (sensitivity_value / 100) * 2  # Scale factor
+        
         sensitivities = {
-            'temperature_sensitivity': (sensitivity_value / 100) * 2,
-            'economic_growth_sensitivity': (sensitivity_value / 100) * 1.5,
-            'adaptation_sensitivity': (sensitivity_value / 100) * 1.2,
-            'technology_sensitivity': (sensitivity_value / 100) * 1.8
+            'temperature_sensitivity': max(0.1, sensitivity_factor * 1.0) * base_economic_value,
+            'economic_growth_sensitivity': max(0.1, sensitivity_factor * 0.8) * base_economic_value,
+            'adaptation_sensitivity': max(0.1, sensitivity_factor * 1.2) * base_economic_value,
+            'technology_sensitivity': max(0.1, sensitivity_factor * 1.5) * base_economic_value
         }
         
-        result = {key: base_economic_value * value for key, value in sensitivities.items()}
-        
-        logging.info(f"Sensitivity analysis result: {json.dumps(result, indent=2)}")
-        return result
+        logging.info(f"Sensitivity analysis result: {json.dumps(sensitivities, indent=2)}")
+        return sensitivities
 
     except (ValueError, TypeError, IndexError) as e:
         logging.error(f"Error in sensitivity analysis: {str(e)}", exc_info=True)
         return {
-            'temperature_sensitivity': 0,
-            'economic_growth_sensitivity': 0,
-            'adaptation_sensitivity': 0,
-            'technology_sensitivity': 0
+            'temperature_sensitivity': 0.1,
+            'economic_growth_sensitivity': 0.1,
+            'adaptation_sensitivity': 0.1,
+            'technology_sensitivity': 0.1
         }
 
 def export_data(data, format_type):
