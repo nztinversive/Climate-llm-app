@@ -75,7 +75,9 @@ def generate_scenarios(data, scenario_type='all'):
         return {scenario_type: scenarios[scenario_type]}
 
 def perform_sensitivity_analysis(data, sensitivity_value=50):
-    logging.info(f"Performing sensitivity analysis with data: {data}")
+    logging.info(f"Starting sensitivity analysis with sensitivity_value: {sensitivity_value}")
+    logging.info(f"Input data structure: {json.dumps(data, indent=2)}")
+
     if not data or 'economicData' not in data or not data['economicData']:
         logging.warning("No economic data provided for sensitivity analysis")
         return {
@@ -85,48 +87,39 @@ def perform_sensitivity_analysis(data, sensitivity_value=50):
             'technology_sensitivity': 0
         }
     
-    latest_economic_data = data['economicData'][-1]
-    
-    if 'gdp' in latest_economic_data:
-        base_economic_value = latest_economic_data['gdp']
-    elif 'impact' in latest_economic_data:
-        base_economic_value = latest_economic_data['impact']
-    else:
-        logging.error(f"No 'gdp' or 'impact' key found in economic data: {latest_economic_data}")
+    try:
+        latest_economic_data = data['economicData'][-1]
+        logging.info(f"Latest economic data: {json.dumps(latest_economic_data, indent=2)}")
+        
+        if 'gdp' in latest_economic_data:
+            base_economic_value = float(latest_economic_data['gdp'])
+        elif 'impact' in latest_economic_data:
+            base_economic_value = float(latest_economic_data['impact'])
+        else:
+            raise ValueError(f"No 'gdp' or 'impact' key found in economic data: {latest_economic_data}")
+        
+        logging.info(f"Base economic value for sensitivity analysis: {base_economic_value}")
+        
+        sensitivities = {
+            'temperature_sensitivity': (sensitivity_value / 100) * 2,
+            'economic_growth_sensitivity': (sensitivity_value / 100) * 1.5,
+            'adaptation_sensitivity': (sensitivity_value / 100) * 1.2,
+            'technology_sensitivity': (sensitivity_value / 100) * 1.8
+        }
+        
+        result = {key: base_economic_value * value for key, value in sensitivities.items()}
+        
+        logging.info(f"Sensitivity analysis result: {json.dumps(result, indent=2)}")
+        return result
+
+    except (ValueError, TypeError, IndexError) as e:
+        logging.error(f"Error in sensitivity analysis: {str(e)}", exc_info=True)
         return {
             'temperature_sensitivity': 0,
             'economic_growth_sensitivity': 0,
             'adaptation_sensitivity': 0,
             'technology_sensitivity': 0
         }
-    
-    if base_economic_value is None:
-        logging.error("Base economic value is None")
-        return {
-            'temperature_sensitivity': 0,
-            'economic_growth_sensitivity': 0,
-            'adaptation_sensitivity': 0,
-            'technology_sensitivity': 0
-        }
-    
-    logging.info(f"Base economic value for sensitivity analysis: {base_economic_value}")
-    
-    sensitivities = {
-        'temperature_sensitivity': (sensitivity_value / 100) * 2,
-        'economic_growth_sensitivity': (sensitivity_value / 100) * 1.5,
-        'adaptation_sensitivity': (sensitivity_value / 100) * 1.2,
-        'technology_sensitivity': (sensitivity_value / 100) * 1.8
-    }
-    
-    result = {
-        'temperature_sensitivity': base_economic_value * sensitivities['temperature_sensitivity'],
-        'economic_growth_sensitivity': base_economic_value * sensitivities['economic_growth_sensitivity'],
-        'adaptation_sensitivity': base_economic_value * sensitivities['adaptation_sensitivity'],
-        'technology_sensitivity': base_economic_value * sensitivities['technology_sensitivity']
-    }
-    
-    logging.info(f"Sensitivity analysis result: {result}")
-    return result
 
 def export_data(data, format_type):
     if format_type == 'json':

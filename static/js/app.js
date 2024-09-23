@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (!economicData || economicData.length === 0) {
             console.error('No economic data available for sensitivity analysis');
-            alert('Error: No economic data available for sensitivity analysis');
+            showErrorMessage('No economic data available for sensitivity analysis');
             return;
         }
         
@@ -186,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (validEconomicData.length === 0) {
             console.error('No valid GDP or impact values found in economic data');
-            alert('Error: No valid GDP or impact values found in economic data');
+            showErrorMessage('No valid GDP or impact values found in economic data');
             return;
         }
         
@@ -195,7 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
             sensitivity: sensitivityValue
         };
 
-        console.log('Sending sensitivity update request:', data);
+        console.log('Sending sensitivity update request:', JSON.stringify(data, null, 2));
 
         fetch('/api/update_sensitivity', {
             method: 'POST',
@@ -213,16 +213,18 @@ document.addEventListener('DOMContentLoaded', () => {
             return response.json();
         })
         .then(updatedSensitivity => {
+            console.log('Received sensitivity update response:', JSON.stringify(updatedSensitivity, null, 2));
             if (updatedSensitivity && typeof updatedSensitivity === 'object') {
                 updateSensitivityChart(updatedSensitivity);
                 console.log('Sensitivity chart updated with data:', updatedSensitivity);
             } else {
                 console.error('Invalid sensitivity data received:', updatedSensitivity);
+                showErrorMessage('Invalid sensitivity data received from the server');
             }
         })
         .catch(error => {
             console.error('Error updating sensitivity:', error);
-            alert('An error occurred while updating the sensitivity: ' + error.message);
+            showErrorMessage('An error occurred while updating the sensitivity: ' + error.message);
         });
     }
 
@@ -258,5 +260,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         return data;
+    }
+
+    function showErrorMessage(message) {
+        const errorDiv = document.createElement('div');
+        errorDiv.textContent = message;
+        errorDiv.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #f44336;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            z-index: 1000;
+        `;
+        document.body.appendChild(errorDiv);
+        setTimeout(() => {
+            errorDiv.remove();
+        }, 5000);
     }
 });

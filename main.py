@@ -114,7 +114,7 @@ def api_update_scenario():
 def api_update_sensitivity():
     try:
         data = request.json
-        logging.info(f"Received sensitivity update request: {json.dumps(data)}")
+        logging.info(f"Received sensitivity update request: {json.dumps(data, indent=2)}")
 
         if not data:
             raise ValueError("No data provided in the request")
@@ -132,13 +132,13 @@ def api_update_sensitivity():
 
         updated_sensitivity = perform_sensitivity_analysis({'economicData': economic_data}, sensitivity_value)
         
-        logging.info(f"Sensitivity analysis completed. Result: {json.dumps(updated_sensitivity)}")
+        logging.info(f"Sensitivity analysis completed. Result: {json.dumps(updated_sensitivity, indent=2)}")
 
         return jsonify(updated_sensitivity)
     except Exception as e:
         error_message = str(e)
         logging.error(f"Error in update_sensitivity: {error_message}", exc_info=True)
-        return jsonify({'error': error_message}), 400
+        return jsonify({'error': error_message, 'details': str(e.__class__.__name__)}), 400
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
