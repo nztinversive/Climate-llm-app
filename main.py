@@ -18,15 +18,25 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 @app.route('/')
 def index():
+    logging.info('Index route accessed')
     if 'data' not in session:
+        logging.info('Loading default data into session')
         session['data'] = load_default_data()
+    else:
+        logging.info('Using existing data from session')
+    
+    logging.info(f'Session data: {json.dumps(session["data"], indent=2)}')
+    
     current_year = datetime.now().year
     return render_template('index.html', current_year=current_year)
 
 @app.route('/api/get_default_data', methods=['GET'])
 def api_get_default_data():
+    logging.info('Default data requested')
     if 'data' not in session:
+        logging.info('Loading default data into session')
         session['data'] = load_default_data()
+    logging.info(f'Returning default data: {json.dumps(session["data"], indent=2)}')
     return jsonify(session['data'])
 
 @app.route('/api/process_data', methods=['POST'])

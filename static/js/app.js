@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM content loaded, initializing application');
     const importBtn = document.getElementById('importBtn');
     const exportBtn = document.getElementById('exportBtn');
     const fileInput = document.getElementById('fileInput');
@@ -17,9 +18,11 @@ document.addEventListener('DOMContentLoaded', () => {
     loadDefaultData();
 
     function loadDefaultData() {
+        console.log('Loading default data');
         fetch('/api/get_default_data')
             .then(response => response.json())
             .then(data => {
+                console.log('Default data received:', data);
                 processData(data);
             })
             .catch(error => {
@@ -92,6 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function processData(data) {
+        console.log('Processing data:', data);
         fetch('/api/process_data', {
             method: 'POST',
             headers: {
@@ -101,6 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .then(response => response.json())
         .then(processedData => {
+            console.log('Processed data received:', processedData);
             initCharts(processedData);
             updateCharts(processedData);
             saveSession(processedData);

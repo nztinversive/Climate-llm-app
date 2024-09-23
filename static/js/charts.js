@@ -1,6 +1,7 @@
 let temperatureChart, economicChart, riskChart, scenarioChart, sensitivityChart;
 
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM content loaded, initializing chart containers');
     initChartContainers();
 });
 
@@ -14,6 +15,7 @@ function initChartContainers() {
 }
 
 function initCharts(data) {
+    console.log('Initializing charts with data:', data);
     if (!data) {
         console.error('No data provided for chart initialization');
         return;
@@ -26,19 +28,34 @@ function initCharts(data) {
     const sensitivityCtx = document.getElementById('sensitivityChart')?.getContext('2d');
 
     if (temperatureCtx) {
+        console.log('Creating temperature chart');
         temperatureChart = createTemperatureChart(temperatureCtx, data.temperatureData);
+    } else {
+        console.error('Temperature chart context not found');
     }
     if (economicCtx) {
+        console.log('Creating economic chart');
         economicChart = createEconomicChart(economicCtx, data.economicData);
+    } else {
+        console.error('Economic chart context not found');
     }
     if (riskCtx) {
+        console.log('Creating risk chart');
         riskChart = createRiskChart(riskCtx, data.riskMetrics);
+    } else {
+        console.error('Risk chart context not found');
     }
     if (scenarioCtx) {
+        console.log('Creating scenario chart');
         scenarioChart = createScenarioChart(scenarioCtx, data.scenarioData);
+    } else {
+        console.error('Scenario chart context not found');
     }
     if (sensitivityCtx) {
+        console.log('Creating sensitivity chart');
         sensitivityChart = createSensitivityChart(sensitivityCtx, data.sensitivityData);
+    } else {
+        console.error('Sensitivity chart context not found');
     }
 }
 
