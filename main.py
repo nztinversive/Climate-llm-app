@@ -44,8 +44,14 @@ def api_load_session(session_id):
 @app.route('/generate_report', methods=['POST'])
 def generate_report():
     data = request.json
-    # Process data and generate report
-    return render_template('report.html', report_data=data)
+    processed_data = process_data(data)
+    return render_template('report.html', report_data=processed_data)
+
+@app.route('/api/advanced_analytics', methods=['POST'])
+def api_advanced_analytics():
+    data = request.json
+    processed_data = process_data(data)
+    return jsonify(processed_data)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

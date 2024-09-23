@@ -3,10 +3,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const exportBtn = document.getElementById('exportBtn');
     const fileInput = document.getElementById('fileInput');
     const generateReportBtn = document.getElementById('generateReportBtn');
+    const runAdvancedAnalyticsBtn = document.getElementById('runAdvancedAnalyticsBtn');
 
     importBtn.addEventListener('click', importData);
     exportBtn.addEventListener('click', exportData);
     generateReportBtn.addEventListener('click', generateReport);
+    runAdvancedAnalyticsBtn.addEventListener('click', runAdvancedAnalytics);
 
     function importData() {
         const file = fileInput.files[0];
@@ -35,10 +37,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function exportData() {
-        // Collect data from charts and other sources
         const data = {
             temperatureData: getTemperatureData(),
-            economicData: getEconomicData()
+            economicData: getEconomicData(),
+            riskMetrics: getRiskMetrics()
         };
 
         fetch('/api/export_data', {
@@ -83,6 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = {
             temperatureData: getTemperatureData(),
             economicData: getEconomicData(),
+            riskMetrics: getRiskMetrics(),
             llmResponses: getLLMResponses()
         };
 
@@ -102,6 +105,27 @@ document.addEventListener('DOMContentLoaded', () => {
         .catch(error => console.error('Error generating report:', error));
     }
 
+    function runAdvancedAnalytics() {
+        const data = {
+            temperatureData: getTemperatureData(),
+            economicData: getEconomicData()
+        };
+
+        fetch('/api/advanced_analytics', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(processedData => {
+            updateCharts(processedData);
+            saveSession(processedData);
+        })
+        .catch(error => console.error('Error running advanced analytics:', error));
+    }
+
     function saveSession(data) {
         fetch('/api/save_session', {
             method: 'POST',
@@ -118,7 +142,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function parseCSV(content) {
-        // Simple CSV parsing logic (can be improved for more complex CSVs)
         const lines = content.split('\n');
         const headers = lines[0].split(',');
         const data = [];
