@@ -177,30 +177,43 @@ function updateRiskChart(data) {
 function updateScenarioChart(scenarioData) {
     console.log('Received scenario data:', JSON.stringify(scenarioData, null, 2));
 
-    if (!scenarioData || !Array.isArray(scenarioData)) {
+    let dataToUse;
+    if (scenarioData && scenarioData.baseline && Array.isArray(scenarioData.baseline)) {
+        dataToUse = scenarioData.baseline;
+    } else if (Array.isArray(scenarioData)) {
+        dataToUse = scenarioData;
+    } else {
         console.error('Invalid scenario data:', scenarioData);
         showErrorMessage('Invalid scenario data received');
         return;
     }
 
-    if (scenarioData.length === 0) {
+    if (dataToUse.length === 0) {
         console.warn('Empty scenario data received');
         showErrorMessage('No scenario data available');
         return;
     }
 
     try {
-        const years = scenarioData.map(d => {
+        const years = dataToUse.map(d => {
             if (!d.year) throw new Error('Missing year in scenario data');
             return d.year;
         });
-        const temperatures = scenarioData.map(d => {
+        const temperatures = dataToUse.map(d => {
             if (d.temperature === undefined || d.temperature === null) throw new Error('Missing temperature in scenario data');
             return d.temperature;
         });
 
         scenarioChart.data.labels = years;
         scenarioChart.data.datasets[0].data = temperatures;
+
+        // Update other scenarios if available
+        if (scenarioData.optimistic && Array.isArray(scenarioData.optimistic)) {
+            scenarioChart.data.datasets[1].data = scenarioData.optimistic.map(d => d.temperature);
+        }
+        if (scenarioData.pessimistic && Array.isArray(scenarioData.pessimistic)) {
+            scenarioChart.data.datasets[2].data = scenarioData.pessimistic.map(d => d.temperature);
+        }
 
         scenarioChart.update();
         console.log('Scenario chart updated successfully');
