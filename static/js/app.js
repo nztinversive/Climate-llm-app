@@ -22,7 +22,10 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(data => {
                 processData(data);
             })
-            .catch(error => console.error('Error loading default data:', error));
+            .catch(error => {
+                console.error('Error loading default data:', error);
+                showErrorMessage('Error loading default data. Please try refreshing the page.');
+            });
     }
 
     function importData() {
@@ -37,16 +40,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const content = e.target.result;
             let data;
             
-            if (file.name.endsWith('.json')) {
-                data = JSON.parse(content);
-            } else if (file.name.endsWith('.csv')) {
-                data = parseCSV(content);
-            } else {
-                alert('Unsupported file format. Please use JSON or CSV.');
-                return;
+            try {
+                if (file.name.endsWith('.json')) {
+                    data = JSON.parse(content);
+                } else if (file.name.endsWith('.csv')) {
+                    data = parseCSV(content);
+                } else {
+                    throw new Error('Unsupported file format. Please use JSON or CSV.');
+                }
+                processData(data);
+            } catch (error) {
+                console.error('Error parsing imported data:', error);
+                showErrorMessage('Error parsing imported data. Please check the file format.');
             }
-
-            processData(data);
         };
         reader.readAsText(file);
     }
@@ -79,7 +85,10 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
         })
-        .catch(error => console.error('Error exporting data:', error));
+        .catch(error => {
+            console.error('Error exporting data:', error);
+            showErrorMessage('Error exporting data. Please try again.');
+        });
     }
 
     function processData(data) {
@@ -92,10 +101,14 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .then(response => response.json())
         .then(processedData => {
+            initCharts(processedData);
             updateCharts(processedData);
             saveSession(processedData);
         })
-        .catch(error => console.error('Error processing data:', error));
+        .catch(error => {
+            console.error('Error processing data:', error);
+            showErrorMessage('Error processing data. Please try again.');
+        });
     }
 
     function generateReport() {
@@ -121,7 +134,10 @@ document.addEventListener('DOMContentLoaded', () => {
             reportWindow.document.write(html);
             reportWindow.document.close();
         })
-        .catch(error => console.error('Error generating report:', error));
+        .catch(error => {
+            console.error('Error generating report:', error);
+            showErrorMessage('Error generating report. Please try again.');
+        });
     }
 
     function runAdvancedAnalytics() {
@@ -142,7 +158,10 @@ document.addEventListener('DOMContentLoaded', () => {
             updateCharts(processedData);
             saveSession(processedData);
         })
-        .catch(error => console.error('Error running advanced analytics:', error));
+        .catch(error => {
+            console.error('Error running advanced analytics:', error);
+            showErrorMessage('Error running advanced analytics. Please try again.');
+        });
     }
 
     function updateScenario() {
@@ -165,17 +184,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateScenarioChart(updatedScenario[selectedScenario]);
             } else {
                 console.error('Invalid scenario data received:', updatedScenario);
+                showErrorMessage('Error updating scenario. Please try again.');
             }
         })
-        .catch(error => console.error('Error updating scenario:', error));
+        .catch(error => {
+            console.error('Error updating scenario:', error);
+            showErrorMessage('Error updating scenario. Please try again.');
+        });
     }
 
     function updateSensitivity() {
         const sensitivityValue = parseInt(sensitivitySlider.value);
         const economicData = getEconomicData();
-        
-        console.log('Updating sensitivity. Slider value:', sensitivityValue);
-        console.log('Economic data:', JSON.stringify(economicData, null, 2));
         
         if (!economicData || economicData.length === 0) {
             console.error('No economic data available for sensitivity analysis');
@@ -188,8 +208,6 @@ document.addEventListener('DOMContentLoaded', () => {
             sensitivity: sensitivityValue
         };
 
-        console.log('Sending sensitivity update request:', JSON.stringify(data, null, 2));
-
         fetch('/api/update_sensitivity', {
             method: 'POST',
             headers: {
@@ -198,7 +216,6 @@ document.addEventListener('DOMContentLoaded', () => {
             body: JSON.stringify(data)
         })
         .then(response => {
-            console.log('Received response from server:', response);
             if (!response.ok) {
                 return response.json().then(errorData => {
                     throw new Error(errorData.error || 'Network response was not ok');
@@ -207,10 +224,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return response.json();
         })
         .then(updatedSensitivity => {
-            console.log('Received sensitivity update response:', JSON.stringify(updatedSensitivity, null, 2));
             if (updatedSensitivity && typeof updatedSensitivity === 'object' && !('error' in updatedSensitivity)) {
                 updateSensitivityChart(updatedSensitivity);
-                console.log('Sensitivity chart updated with data:', updatedSensitivity);
             } else {
                 throw new Error('Invalid sensitivity data received from the server');
             }
@@ -236,7 +251,10 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(result => {
             console.log('Session saved with ID:', result.session_id);
         })
-        .catch(error => console.error('Error saving session:', error));
+        .catch(error => {
+            console.error('Error saving session:', error);
+            showErrorMessage('Error saving session. Your progress may not be saved.');
+        });
     }
 
     function parseCSV(content) {
@@ -257,24 +275,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         return data;
     }
-
-    function showErrorMessage(message) {
-        const errorDiv = document.createElement('div');
-        errorDiv.textContent = message;
-        errorDiv.style.cssText = `
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #f44336;
-            color: white;
-            padding: 15px;
-            border-radius: 5px;
-            z-index: 1000;
-        `;
-        document.body.appendChild(errorDiv);
-        setTimeout(() => {
-            errorDiv.remove();
-        }, 5000);
-    }
 });
+
+function getLLMResponses() {
+    return JSON.parse(localStorage.getItem('llmResponses') || '[]');
+}
