@@ -46,6 +46,43 @@ def process_data(data):
         "riskMetrics": risk_metrics
     }
 
+def generate_scenarios(data, scenario_type='all'):
+    base_data = data['temperatureData']
+    years = [entry['year'] for entry in base_data]
+    base_temperatures = [entry['temperature'] for entry in base_data]
+    
+    def generate_scenario(modifier):
+        return [{'year': year, 'temperature': temp + modifier * (i / len(years))} 
+                for i, (year, temp) in enumerate(zip(years, base_temperatures))]
+    
+    scenarios = {
+        'baseline': base_data,
+        'optimistic': generate_scenario(-0.5),
+        'pessimistic': generate_scenario(0.5)
+    }
+    
+    if scenario_type == 'all':
+        return scenarios
+    else:
+        return {scenario_type: scenarios[scenario_type]}
+
+def perform_sensitivity_analysis(data, sensitivity_value=50):
+    base_economic_impact = data['economicData'][-1]['impact']
+    
+    sensitivities = {
+        'temperature_sensitivity': (sensitivity_value / 100) * 2,
+        'economic_growth_sensitivity': (sensitivity_value / 100) * 1.5,
+        'adaptation_sensitivity': (sensitivity_value / 100) * 1.2,
+        'technology_sensitivity': (sensitivity_value / 100) * 1.8
+    }
+    
+    return {
+        'temperature_sensitivity': base_economic_impact * sensitivities['temperature_sensitivity'],
+        'economic_growth_sensitivity': base_economic_impact * sensitivities['economic_growth_sensitivity'],
+        'adaptation_sensitivity': base_economic_impact * sensitivities['adaptation_sensitivity'],
+        'technology_sensitivity': base_economic_impact * sensitivities['technology_sensitivity']
+    }
+
 def export_data(data, format_type):
     if format_type == 'json':
         return json.dumps(data, indent=2)

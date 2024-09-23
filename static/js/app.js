@@ -4,11 +4,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const fileInput = document.getElementById('fileInput');
     const generateReportBtn = document.getElementById('generateReportBtn');
     const runAdvancedAnalyticsBtn = document.getElementById('runAdvancedAnalyticsBtn');
+    const scenarioSelect = document.getElementById('scenarioSelect');
+    const sensitivitySlider = document.getElementById('sensitivitySlider');
 
     importBtn.addEventListener('click', importData);
     exportBtn.addEventListener('click', exportData);
     generateReportBtn.addEventListener('click', generateReport);
     runAdvancedAnalyticsBtn.addEventListener('click', runAdvancedAnalytics);
+    scenarioSelect.addEventListener('change', updateScenario);
+    sensitivitySlider.addEventListener('input', updateSensitivity);
 
     function importData() {
         const file = fileInput.files[0];
@@ -40,7 +44,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = {
             temperatureData: getTemperatureData(),
             economicData: getEconomicData(),
-            riskMetrics: getRiskMetrics()
+            riskMetrics: getRiskMetrics(),
+            scenarioData: getScenarioData(),
+            sensitivityData: getSensitivityData()
         };
 
         fetch('/api/export_data', {
@@ -86,6 +92,8 @@ document.addEventListener('DOMContentLoaded', () => {
             temperatureData: getTemperatureData(),
             economicData: getEconomicData(),
             riskMetrics: getRiskMetrics(),
+            scenarioData: getScenarioData(),
+            sensitivityData: getSensitivityData(),
             llmResponses: getLLMResponses()
         };
 
@@ -124,6 +132,48 @@ document.addEventListener('DOMContentLoaded', () => {
             saveSession(processedData);
         })
         .catch(error => console.error('Error running advanced analytics:', error));
+    }
+
+    function updateScenario() {
+        const selectedScenario = scenarioSelect.value;
+        const data = {
+            temperatureData: getTemperatureData(),
+            scenario: selectedScenario
+        };
+
+        fetch('/api/update_scenario', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(updatedScenario => {
+            updateScenarioChart(updatedScenario);
+        })
+        .catch(error => console.error('Error updating scenario:', error));
+    }
+
+    function updateSensitivity() {
+        const sensitivityValue = sensitivitySlider.value;
+        const data = {
+            economicData: getEconomicData(),
+            sensitivity: sensitivityValue
+        };
+
+        fetch('/api/update_sensitivity', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(updatedSensitivity => {
+            updateSensitivityChart(updatedSensitivity);
+        })
+        .catch(error => console.error('Error updating sensitivity:', error));
     }
 
     function saveSession(data) {

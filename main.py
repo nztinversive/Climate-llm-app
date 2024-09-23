@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify
-from utils.data_processor import process_data, export_data
+from utils.data_processor import process_data, export_data, generate_scenarios, perform_sensitivity_analysis
 from utils.llm_integration import get_llm_response
 from utils.replit_db import ReplitDB
 import json
@@ -15,7 +15,16 @@ def index():
 def api_process_data():
     data = request.json
     processed_data = process_data(data)
-    return jsonify(processed_data)
+    scenario_data = generate_scenarios(processed_data)
+    sensitivity_data = perform_sensitivity_analysis(processed_data)
+    
+    result = {
+        **processed_data,
+        'scenarioData': scenario_data,
+        'sensitivityData': sensitivity_data
+    }
+    
+    return jsonify(result)
 
 @app.route('/api/export_data', methods=['POST'])
 def api_export_data():
@@ -45,13 +54,47 @@ def api_load_session(session_id):
 def generate_report():
     data = request.json
     processed_data = process_data(data)
-    return render_template('report.html', report_data=processed_data)
+    scenario_data = generate_scenarios(processed_data)
+    sensitivity_data = perform_sensitivity_analysis(processed_data)
+    
+    report_data = {
+        **processed_data,
+        'scenarioData': scenario_data,
+        'sensitivityData': sensitivity_data
+    }
+    
+    return render_template('report.html', report_data=report_data)
 
 @app.route('/api/advanced_analytics', methods=['POST'])
 def api_advanced_analytics():
     data = request.json
     processed_data = process_data(data)
-    return jsonify(processed_data)
+    scenario_data = generate_scenarios(processed_data)
+    sensitivity_data = perform_sensitivity_analysis(processed_data)
+    
+    result = {
+        **processed_data,
+        'scenarioData': scenario_data,
+        'sensitivityData': sensitivity_data
+    }
+    
+    return jsonify(result)
+
+@app.route('/api/update_scenario', methods=['POST'])
+def api_update_scenario():
+    data = request.json
+    scenario_type = data.get('scenario', 'baseline')
+    processed_data = process_data(data)
+    updated_scenario = generate_scenarios(processed_data, scenario_type)
+    return jsonify(updated_scenario)
+
+@app.route('/api/update_sensitivity', methods=['POST'])
+def api_update_sensitivity():
+    data = request.json
+    sensitivity_value = data.get('sensitivity', 50)
+    processed_data = process_data(data)
+    updated_sensitivity = perform_sensitivity_analysis(processed_data, sensitivity_value)
+    return jsonify(updated_sensitivity)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

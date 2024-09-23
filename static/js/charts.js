@@ -1,4 +1,4 @@
-let temperatureChart, economicChart, riskChart;
+let temperatureChart, economicChart, riskChart, scenarioChart, sensitivityChart;
 
 document.addEventListener('DOMContentLoaded', () => {
     initCharts();
@@ -8,6 +8,8 @@ function initCharts() {
     const temperatureCtx = document.getElementById('temperatureChart').getContext('2d');
     const economicCtx = document.getElementById('economicChart').getContext('2d');
     const riskCtx = document.getElementById('riskChart').getContext('2d');
+    const scenarioCtx = document.getElementById('scenarioChart').getContext('2d');
+    const sensitivityCtx = document.getElementById('sensitivityChart').getContext('2d');
 
     temperatureChart = new Chart(temperatureCtx, {
         type: 'line',
@@ -56,17 +58,49 @@ function initCharts() {
     });
 
     riskChart = new Chart(riskCtx, {
-        type: 'bar',
+        type: 'radar',
         data: {
-            labels: ['Mean Temperature', '95% VaR', 'Max Temperature'],
+            labels: ['Mean Temperature', '95% VaR', 'Max Temperature', 'Economic Impact', 'Adaptation Cost'],
             datasets: [{
-                label: 'Temperature Risk Metrics (°C)',
+                label: 'Risk Metrics',
                 data: [],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.6)',
-                    'rgba(54, 162, 235, 0.6)',
-                    'rgba(255, 206, 86, 0.6)'
-                ]
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgb(255, 99, 132)',
+                pointBackgroundColor: 'rgb(255, 99, 132)',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: 'rgb(255, 99, 132)'
+            }]
+        },
+        options: {
+            responsive: true,
+            elements: {
+                line: {
+                    borderWidth: 3
+                }
+            }
+        }
+    });
+
+    scenarioChart = new Chart(scenarioCtx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Baseline Scenario',
+                data: [],
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
+            }, {
+                label: 'Optimistic Scenario',
+                data: [],
+                borderColor: 'rgb(54, 162, 235)',
+                tension: 0.1
+            }, {
+                label: 'Pessimistic Scenario',
+                data: [],
+                borderColor: 'rgb(255, 99, 132)',
+                tension: 0.1
             }]
         },
         options: {
@@ -78,12 +112,39 @@ function initCharts() {
             }
         }
     });
+
+    sensitivityChart = new Chart(sensitivityCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Temperature Change', 'Economic Growth', 'Adaptation Measures', 'Technology Advancement'],
+            datasets: [{
+                label: 'Sensitivity to Economic Impact',
+                data: [],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.6)',
+                    'rgba(54, 162, 235, 0.6)',
+                    'rgba(255, 206, 86, 0.6)',
+                    'rgba(75, 192, 192, 0.6)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
 }
 
 function updateCharts(data) {
     updateTemperatureChart(data.temperatureData);
     updateEconomicChart(data.economicData);
     updateRiskChart(data.riskMetrics);
+    updateScenarioChart(data.scenarioData);
+    updateSensitivityChart(data.sensitivityData);
 }
 
 function updateTemperatureChart(data) {
@@ -106,9 +167,29 @@ function updateRiskChart(data) {
     riskChart.data.datasets[0].data = [
         data.mean_temperature,
         data.var_95,
-        data.max_temperature
+        data.max_temperature,
+        data.economic_impact,
+        data.adaptation_cost
     ];
     riskChart.update();
+}
+
+function updateScenarioChart(data) {
+    scenarioChart.data.labels = data.baseline.map(d => d.year);
+    scenarioChart.data.datasets[0].data = data.baseline.map(d => d.temperature);
+    scenarioChart.data.datasets[1].data = data.optimistic.map(d => d.temperature);
+    scenarioChart.data.datasets[2].data = data.pessimistic.map(d => d.temperature);
+    scenarioChart.update();
+}
+
+function updateSensitivityChart(data) {
+    sensitivityChart.data.datasets[0].data = [
+        data.temperature_sensitivity,
+        data.economic_growth_sensitivity,
+        data.adaptation_sensitivity,
+        data.technology_sensitivity
+    ];
+    sensitivityChart.update();
 }
 
 function getTemperatureData() {
@@ -126,9 +207,43 @@ function getEconomicData() {
 }
 
 function getRiskMetrics() {
+    const data = riskChart.data.datasets[0].data;
     return {
-        mean_temperature: riskChart.data.datasets[0].data[0],
-        var_95: riskChart.data.datasets[0].data[1],
-        max_temperature: riskChart.data.datasets[0].data[2]
+        mean_temperature: data[0],
+        var_95: data[1],
+        max_temperature: data[2],
+        economic_impact: data[3],
+        adaptation_cost: data[4]
+    };
+}
+
+function getScenarioData() {
+    const baseline = scenarioChart.data.datasets[0].data;
+    const optimistic = scenarioChart.data.datasets[1].data;
+    const pessimistic = scenarioChart.data.datasets[2].data;
+    
+    return {
+        baseline: baseline.map((value, index) => ({
+            year: scenarioChart.data.labels[index],
+            temperature: value
+        })),
+        optimistic: optimistic.map((value, index) => ({
+            year: scenarioChart.data.labels[index],
+            temperature: value
+        })),
+        pessimistic: pessimistic.map((value, index) => ({
+            year: scenarioChart.data.labels[index],
+            temperature: value
+        }))
+    };
+}
+
+function getSensitivityData() {
+    const data = sensitivityChart.data.datasets[0].data;
+    return {
+        temperature_sensitivity: data[0],
+        economic_growth_sensitivity: data[1],
+        adaptation_sensitivity: data[2],
+        technology_sensitivity: data[3]
     };
 }
