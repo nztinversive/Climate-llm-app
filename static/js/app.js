@@ -19,15 +19,19 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeApplication();
 
     function initializeApplication() {
-        setTimeout(() => {
-            loadDefaultData();
-        }, 500);
+        console.log('Initializing application');
+        loadDefaultData();
     }
 
     function loadDefaultData() {
         console.log('Loading default data');
         fetch('/api/get_default_data')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 console.log('Default data received:', data);
                 processData(data);
@@ -47,7 +51,12 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             body: JSON.stringify(data)
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(processedData => {
             console.log('Processed data received:', processedData);
             updateCharts(processedData);
@@ -149,12 +158,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showErrorMessage(message) {
-        console.error(message);
+        console.error('Error:', message);
         alert(message);
     }
 
     function saveSession(data) {
         console.log('Saving session data:', data);
+        // Implement session saving logic here
     }
 });
 

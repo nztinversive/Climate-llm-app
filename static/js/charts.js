@@ -46,12 +46,23 @@ function createChartWithRetry(chartId, createChartFunc, retryCount) {
         const ctx = canvas.getContext('2d');
         if (ctx) {
             console.log(`Creating ${chartId}`);
-            createChartFunc(ctx);
+            try {
+                createChartFunc(ctx);
+                console.log(`${chartId} created successfully`);
+            } catch (error) {
+                console.error(`Error creating ${chartId}:`, error);
+                if (retryCount < MAX_RETRIES) {
+                    console.log(`Retrying ${chartId} creation. Attempt ${retryCount + 1}`);
+                    setTimeout(() => createChartWithRetry(chartId, createChartFunc, retryCount + 1), RETRY_DELAY);
+                } else {
+                    console.error(`Failed to create ${chartId} after ${MAX_RETRIES} attempts`);
+                }
+            }
         } else {
             console.error(`Unable to get 2D context for ${chartId}`);
         }
     } else if (retryCount < MAX_RETRIES) {
-        console.log(`Retrying ${chartId} creation. Attempt ${retryCount + 1}`);
+        console.log(`${chartId} element not found. Retrying. Attempt ${retryCount + 1}`);
         setTimeout(() => createChartWithRetry(chartId, createChartFunc, retryCount + 1), RETRY_DELAY);
     } else {
         console.error(`${chartId} element not found after ${MAX_RETRIES} attempts`);
@@ -59,6 +70,10 @@ function createChartWithRetry(chartId, createChartFunc, retryCount) {
 }
 
 function createTemperatureChart(data) {
+    if (!data || !Array.isArray(data) || data.length === 0) {
+        console.error('Invalid temperature data:', data);
+        return;
+    }
     const ctx = document.getElementById('temperatureChart').getContext('2d');
     temperatureChart = new Chart(ctx, {
         type: 'line',
@@ -206,16 +221,22 @@ function getScenarioColor(scenario) {
 }
 
 function updateCharts(data) {
+    console.log('Updating charts with data:', data);
     if (!data) {
         console.error('No data provided for chart update');
         return;
     }
 
-    updateTemperatureChart(data.temperatureData);
-    updateEconomicChart(data.economicData);
-    updateRiskChart(data.riskMetrics);
-    updateScenarioChart(data.scenarioData);
-    updateSensitivityChart(data.sensitivityData);
+    try {
+        updateTemperatureChart(data.temperatureData);
+        updateEconomicChart(data.economicData);
+        updateRiskChart(data.riskMetrics);
+        updateScenarioChart(data.scenarioData);
+        updateSensitivityChart(data.sensitivityData);
+        console.log('All charts updated successfully');
+    } catch (error) {
+        console.error('Error updating charts:', error);
+    }
 }
 
 function updateTemperatureChart(data) {
@@ -266,6 +287,6 @@ function updateSensitivityChart(data) {
 }
 
 function showErrorMessage(message) {
-    console.error(message);
+    console.error('Error:', message);
     alert(message);
 }
