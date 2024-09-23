@@ -12,120 +12,134 @@
                     colors: {
                         primary: '#3B82F6',
                         secondary: '#10B981',
+                        background: '#F3F4F6',
+                        card: '#FFFFFF',
+                        text: '#1F2937',
                     }
                 }
             }
         }
     </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Remove the Chart.js script -->
 </head>
-<body class="bg-gray-100">
+<body class="bg-background text-text">
     {% include 'components/header.html' %}
 
     <main class="container mx-auto mt-8 p-4">
         <h1 class="text-4xl font-bold mb-8 text-center text-primary">Climate Economic Modeling Tool</h1>
         
-        <!-- LLM Query Section -->
-        <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
-            <h2 class="text-2xl font-semibold mb-4 text-primary">Ask the Climate AI</h2>
-            <div class="flex items-center">
-                <input type="text" id="llmQuery" placeholder="Ask a question about climate economics..." class="flex-grow p-3 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-primary">
-                <button id="llmQueryBtn" class="bg-primary text-white px-6 py-3 rounded-r-lg hover:bg-blue-700 transition duration-300">Ask</button>
-            </div>
-            <div id="llmResponse" class="mt-4 p-4 bg-gray-100 rounded-lg hidden">
-                <h3 class="font-semibold mb-2 text-primary">AI Response:</h3>
-                <div id="llmResponseText" class="prose max-w-none"></div>
-            </div>
-        </div>
-        
-        <!-- Chart Containers -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="bg-white p-6 rounded-lg shadow-lg">
-                <h2 class="text-2xl font-semibold mb-4 text-primary">Temperature Trends</h2>
-                <div id="temperatureChart" class="chart-container" style="height: 300px;"></div>
-                <div id="temperatureChartError" class="text-red-600 mt-2 hidden">Error loading chart. Please refresh the page.</div>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-lg">
-                <h2 class="text-2xl font-semibold mb-4 text-primary">Economic Impact</h2>
-                <div id="economicChart" class="chart-container" style="height: 300px;"></div>
-                <div id="economicChartError" class="text-red-600 mt-2 hidden">Error loading chart. Please refresh the page.</div>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-lg">
-                <h2 class="text-2xl font-semibold mb-4 text-primary">Risk Assessment</h2>
-                <div id="riskChart" class="chart-container" style="height: 300px;"></div>
-                <div id="riskChartError" class="text-red-600 mt-2 hidden">Error loading chart. Please refresh the page.</div>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-lg">
-                <h2 class="text-2xl font-semibold mb-4 text-primary">Temperature Scenarios</h2>
-                <div id="scenarioChart" class="chart-container" style="height: 300px;"></div>
-                <div id="scenarioChartError" class="text-red-600 mt-2 hidden">Error loading chart. Please refresh the page.</div>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-lg">
-                <h2 class="text-2xl font-semibold mb-4 text-primary">Economic Sensitivity</h2>
-                <div id="sensitivityChart" class="chart-container" style="height: 300px;"></div>
-                <div id="sensitivityChartError" class="text-red-600 mt-2 hidden">Error loading chart. Please refresh the page.</div>
-            </div>
-        </div>
-        
-        <!-- Add this after the chart containers and before the controls section -->
-        <div id="summarySection" class="mt-8 bg-white p-6 rounded-lg shadow-lg hidden">
-            <h2 class="text-2xl font-semibold mb-4 text-primary">Data Summary</h2>
-            <p id="summaryText" class="whitespace-pre-line"></p>
-        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column -->
+            <div class="lg:col-span-1 space-y-8">
+                <!-- LLM Query Section -->
+                <div class="bg-card p-6 rounded-lg shadow-lg">
+                    <h2 class="text-2xl font-semibold mb-4 text-primary">Ask the Climate AI</h2>
+                    <div class="flex items-center">
+                        <input type="text" id="llmQuery" placeholder="Ask a question..." class="flex-grow p-3 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                        <button id="llmQueryBtn" class="bg-primary text-white px-6 py-3 rounded-r-lg hover:bg-blue-700 transition duration-300">
+                            <i class="fas fa-robot mr-2"></i>Ask
+                        </button>
+                    </div>
+                    <div id="llmResponse" class="mt-4 p-4 bg-gray-100 rounded-lg hidden">
+                        <h3 class="font-semibold mb-2 text-primary">AI Response:</h3>
+                        <div id="llmResponseText" class="prose max-w-none"></div>
+                    </div>
+                </div>
 
-        <div id="comparisonSection" class="mt-8 bg-white p-6 rounded-lg shadow-lg hidden">
-            <h2 class="text-2xl font-semibold mb-4 text-primary">Scenario Comparison</h2>
-            <div id="comparisonTableContainer"></div>
-        </div>
+                <!-- Controls Section -->
+                <div class="bg-card p-6 rounded-lg shadow-lg">
+                    <h2 class="text-2xl font-semibold mb-4 text-primary">Controls</h2>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button id="importBtn" class="bg-primary text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">
+                            <i class="fas fa-file-import mr-2"></i>Import
+                        </button>
+                        <button id="exportBtn" class="bg-secondary text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300">
+                            <i class="fas fa-file-export mr-2"></i>Export
+                        </button>
+                        <button id="generateReportBtn" class="bg-primary text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">
+                            <i class="fas fa-file-alt mr-2"></i>Report
+                        </button>
+                        <button id="runAdvancedAnalyticsBtn" class="bg-secondary text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300">
+                            <i class="fas fa-chart-line mr-2"></i>Analytics
+                        </button>
+                        <button id="generateSummaryBtn" class="bg-primary text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">
+                            <i class="fas fa-list mr-2"></i>Summary
+                        </button>
+                        <button id="compareScenarioBtn" class="bg-secondary text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300">
+                            <i class="fas fa-balance-scale mr-2"></i>Compare
+                        </button>
+                    </div>
+                    <div class="mt-4">
+                        <label for="scenarioSelect" class="block text-sm font-medium text-gray-700">Select Scenario:</label>
+                        <select id="scenarioSelect" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md">
+                            <option value="baseline">Baseline</option>
+                            <option value="optimistic">Optimistic</option>
+                            <option value="pessimistic">Pessimistic</option>
+                        </select>
+                    </div>
+                    <div class="mt-4">
+                        <label for="sensitivitySlider" class="block text-sm font-medium text-gray-700">Sensitivity Analysis:</label>
+                        <input type="range" id="sensitivitySlider" min="0" max="100" value="50" class="w-full">
+                    </div>
+                    <input type="file" id="fileInput" class="hidden" accept=".json,.csv">
+                </div>
+            </div>
 
-        <!-- Controls Section -->
-        <div class="mt-8 bg-white p-6 rounded-lg shadow-lg">
-            <h2 class="text-2xl font-semibold mb-4 text-primary">Controls</h2>
-            <div class="flex flex-wrap gap-4">
-                <button id="importBtn" class="bg-primary text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">Import Data</button>
-                <button id="exportBtn" class="bg-primary text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">Export Data</button>
-                <button id="generateReportBtn" class="bg-primary text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">Generate Report</button>
-                <button id="runAdvancedAnalyticsBtn" class="bg-primary text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">Run Advanced Analytics</button>
-                <button id="generateSummaryBtn" class="bg-primary text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">Generate Summary</button>
-                <button id="compareScenarioBtn" class="bg-primary text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">Compare Scenarios</button>
+            <!-- Center and Right Columns -->
+            <div class="lg:col-span-2 space-y-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Temperature Trends -->
+                    <div class="bg-card p-6 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-semibold mb-4 text-primary">Temperature Trends</h2>
+                        <div id="temperatureChart" class="chart-container" style="height: 300px;"></div>
+                        <div id="temperatureChartError" class="text-red-600 mt-2 hidden">Error loading chart. Please refresh the page.</div>
+                    </div>
+                    <!-- Economic Impact -->
+                    <div class="bg-card p-6 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-semibold mb-4 text-primary">Economic Impact</h2>
+                        <div id="economicChart" class="chart-container" style="height: 300px;"></div>
+                        <div id="economicChartError" class="text-red-600 mt-2 hidden">Error loading chart. Please refresh the page.</div>
+                    </div>
+                    <!-- Risk Assessment -->
+                    <div class="bg-card p-6 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-semibold mb-4 text-primary">Risk Assessment</h2>
+                        <div id="riskChart" class="chart-container" style="height: 300px;"></div>
+                        <div id="riskChartError" class="text-red-600 mt-2 hidden">Error loading chart. Please refresh the page.</div>
+                    </div>
+                    <!-- Temperature Scenarios -->
+                    <div class="bg-card p-6 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-semibold mb-4 text-primary">Temperature Scenarios</h2>
+                        <div id="scenarioChart" class="chart-container" style="height: 300px;"></div>
+                        <div id="scenarioChartError" class="text-red-600 mt-2 hidden">Error loading chart. Please refresh the page.</div>
+                    </div>
+                </div>
+                <!-- Economic Sensitivity -->
+                <div class="bg-card p-6 rounded-lg shadow-lg">
+                    <h2 class="text-2xl font-semibold mb-4 text-primary">Economic Sensitivity</h2>
+                    <div id="sensitivityChart" class="chart-container" style="height: 300px;"></div>
+                    <div id="sensitivityChartError" class="text-red-600 mt-2 hidden">Error loading chart. Please refresh the page.</div>
+                </div>
+                <!-- Summary Section -->
+                <div id="summarySection" class="bg-card p-6 rounded-lg shadow-lg hidden">
+                    <h2 class="text-2xl font-semibold mb-4 text-primary">Data Summary</h2>
+                    <p id="summaryText" class="whitespace-pre-line"></p>
+                </div>
+                <!-- Comparison Section -->
+                <div id="comparisonSection" class="bg-card p-6 rounded-lg shadow-lg hidden">
+                    <h2 class="text-2xl font-semibold mb-4 text-primary">Scenario Comparison</h2>
+                    <div id="comparisonTableContainer" class="overflow-x-auto"></div>
+                </div>
             </div>
-            <div class="mt-4">
-                <label for="scenarioSelect" class="block text-sm font-medium text-gray-700">Select Scenario:</label>
-                <select id="scenarioSelect" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md">
-                    <option value="baseline">Baseline</option>
-                    <option value="optimistic">Optimistic</option>
-                    <option value="pessimistic">Pessimistic</option>
-                </select>
-            </div>
-            <div class="mt-4">
-                <label for="sensitivitySlider" class="block text-sm font-medium text-gray-700">Sensitivity Analysis:</label>
-                <input type="range" id="sensitivitySlider" min="0" max="100" value="50" class="w-full">
-            </div>
-            <input type="file" id="fileInput" class="hidden" accept=".json,.csv">
         </div>
     </main>
 
     {% include 'components/footer.html' with context %}
 
-    <script>
-        console.log('DOM fully loaded, about to load scripts');
-    </script>
     <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
     <script src="{{ url_for('static', filename='js/llm.js') }}"></script>
-    <script>
-        console.log('All scripts loaded');
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOMContentLoaded event fired');
-            if (typeof initCharts === 'function') {
-                initCharts();
-            } else {
-                console.error('initCharts function not found');
-            }
-        });
-    </script>
 </body>
 </html>

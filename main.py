@@ -199,6 +199,12 @@ def api_update_sensitivity():
 from utils.nlg import generate_chart_summary
 from utils.scenario_comparison import compare_scenarios
 
+# Add this new route
+@app.route('/about')
+def about():
+    current_year = datetime.now().year
+    return render_template('about.html', current_year=current_year)
+
 # Add these new routes
 @app.route('/api/generate_summary', methods=['POST'])
 def api_generate_summary():

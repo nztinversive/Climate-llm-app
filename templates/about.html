@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Climate Economic Modeling Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#10B981',
+                        background: '#F3F4F6',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body class="bg-background">
+    {% include 'components/header.html' %}
+
+    <main class="container mx-auto mt-8 p-4">
+        <h1 class="text-4xl font-bold mb-8 text-center text-primary">About the Climate Economic Modeling Tool</h1>
+        
+        <div class="bg-white p-8 rounded-lg shadow-lg">
+            <p class="mb-4">The Climate Economic Modeling Tool is a sophisticated web application designed to help researchers, policymakers, and climate enthusiasts explore the complex relationships between climate change and economic factors.</p>
+            
+            <h2 class="text-2xl font-semibold mb-4 text-primary">Key Features:</h2>
+            <ul class="list-disc list-inside mb-4">
+                <li>Interactive data visualization of temperature trends and economic impacts</li>
+                <li>Scenario modeling for different climate change projections</li>
+                <li>Sensitivity analysis tools for economic factors</li>
+                <li>AI-powered query system for in-depth analysis</li>
+                <li>Data import/export capabilities for collaborative research</li>
+            </ul>
+
+            <p class="mb-4">Our tool combines cutting-edge climate science with economic modeling to provide a comprehensive platform for understanding and predicting the effects of climate change on global and local economies.</p>
+
+            <p>Whether you're a climate scientist, an economist, or a concerned citizen, this tool offers valuable insights into one of the most pressing issues of our time.</p>
+        </div>
+    </main>
+
+    {% include 'components/footer.html' with context %}
+</body>
+</html>
