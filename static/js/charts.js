@@ -231,20 +231,23 @@ function updateSensitivityChart(sensitivityData) {
         return;
     }
 
-    const data = [
-        sensitivityData.temperature_sensitivity,
-        sensitivityData.economic_growth_sensitivity,
-        sensitivityData.adaptation_sensitivity,
-        sensitivityData.technology_sensitivity
-    ];
-
-    console.log('Parsed sensitivity data:', data);
-
-    if (data.some(value => typeof value !== 'number' || isNaN(value))) {
-        console.error('Invalid numerical values in sensitivity data:', data);
-        showErrorMessage('Invalid numerical values in sensitivity data');
+    const expectedKeys = ['temperature_sensitivity', 'economic_growth_sensitivity', 'adaptation_sensitivity', 'technology_sensitivity'];
+    const missingKeys = expectedKeys.filter(key => !(key in sensitivityData));
+    if (missingKeys.length > 0) {
+        console.error('Missing keys in sensitivity data:', missingKeys);
+        showErrorMessage(`Missing data for: ${missingKeys.join(', ')}`);
         return;
     }
+
+    const data = expectedKeys.map(key => {
+        const value = sensitivityData[key];
+        if (typeof value !== 'number' || isNaN(value)) {
+            throw new Error(`Invalid value for ${key}: ${value}`);
+        }
+        return value;
+    });
+
+    console.log('Parsed sensitivity data:', data);
 
     const labels = [
         'Temperature Change',

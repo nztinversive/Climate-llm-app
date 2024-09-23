@@ -5,6 +5,7 @@ from utils.replit_db import ReplitDB
 import json
 import os
 import logging
+import traceback
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  # Set a secret key for session management
@@ -134,11 +135,19 @@ def api_update_sensitivity():
         
         logging.info(f"Sensitivity analysis completed. Result: {json.dumps(updated_sensitivity, indent=2)}")
 
+        if not all(isinstance(value, (int, float)) for value in updated_sensitivity.values()):
+            raise ValueError("Invalid sensitivity values returned from analysis")
+
         return jsonify(updated_sensitivity)
+    except ValueError as ve:
+        error_message = str(ve)
+        logging.error(f"ValueError in update_sensitivity: {error_message}")
+        return jsonify({'error': error_message, 'errorType': 'ValueError'}), 400
     except Exception as e:
         error_message = str(e)
-        logging.error(f"Error in update_sensitivity: {error_message}", exc_info=True)
-        return jsonify({'error': error_message, 'details': str(e.__class__.__name__)}), 400
+        logging.error(f"Unexpected error in update_sensitivity: {error_message}")
+        logging.error(traceback.format_exc())
+        return jsonify({'error': 'An unexpected error occurred', 'errorType': str(e.__class__.__name__)}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

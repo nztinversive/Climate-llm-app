@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const economicData = getEconomicData();
         
         console.log('Updating sensitivity. Slider value:', sensitivityValue);
-        console.log('Economic data:', economicData);
+        console.log('Economic data:', JSON.stringify(economicData, null, 2));
         
         if (!economicData || economicData.length === 0) {
             console.error('No economic data available for sensitivity analysis');
@@ -208,20 +208,20 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .then(updatedSensitivity => {
             console.log('Received sensitivity update response:', JSON.stringify(updatedSensitivity, null, 2));
-            if (updatedSensitivity && typeof updatedSensitivity === 'object') {
+            if (updatedSensitivity && typeof updatedSensitivity === 'object' && !('error' in updatedSensitivity)) {
                 updateSensitivityChart(updatedSensitivity);
                 console.log('Sensitivity chart updated with data:', updatedSensitivity);
             } else {
-                console.error('Invalid sensitivity data received:', updatedSensitivity);
-                showErrorMessage('Invalid sensitivity data received from the server');
+                throw new Error('Invalid sensitivity data received from the server');
             }
         })
         .catch(error => {
             console.error('Error updating sensitivity:', error);
             showErrorMessage('An error occurred while updating the sensitivity: ' + error.message);
+        })
+        .finally(() => {
+            sensitivitySlider.disabled = false;
         });
-
-        sensitivitySlider.disabled = false;
     }
 
     function saveSession(data) {
