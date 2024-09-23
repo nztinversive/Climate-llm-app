@@ -4,8 +4,13 @@ const RETRY_DELAY = 100; // milliseconds
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM content loaded, initializing charts');
-    loadDefaultData();
+    initCharts();
 });
+
+function initCharts() {
+    console.log('Initializing charts');
+    loadDefaultData();
+}
 
 function loadDefaultData() {
     console.log('Loading default data');
@@ -13,7 +18,7 @@ function loadDefaultData() {
         .then(response => response.json())
         .then(data => {
             console.log('Default data received:', data);
-            initCharts(data);
+            createCharts(data);
         })
         .catch(error => {
             console.error('Error loading default data:', error);
@@ -21,21 +26,21 @@ function loadDefaultData() {
         });
 }
 
-function initCharts(data) {
-    console.log('Initializing charts with data:', data);
+function createCharts(data) {
+    console.log('Creating charts with data:', data);
     if (!data) {
-        console.error('No data provided for chart initialization');
+        console.error('No data provided for chart creation');
         return;
     }
 
-    initChartWithRetry('temperatureChart', () => createTemperatureChart(data.temperatureData), 0);
-    initChartWithRetry('economicChart', () => createEconomicChart(data.economicData), 0);
-    initChartWithRetry('riskChart', () => createRiskChart(data.riskMetrics), 0);
-    initChartWithRetry('scenarioChart', () => createScenarioChart(data.scenarioData), 0);
-    initChartWithRetry('sensitivityChart', () => createSensitivityChart(data.sensitivityData), 0);
+    createChartWithRetry('temperatureChart', () => createTemperatureChart(data.temperatureData), 0);
+    createChartWithRetry('economicChart', () => createEconomicChart(data.economicData), 0);
+    createChartWithRetry('riskChart', () => createRiskChart(data.riskMetrics), 0);
+    createChartWithRetry('scenarioChart', () => createScenarioChart(data.scenarioData), 0);
+    createChartWithRetry('sensitivityChart', () => createSensitivityChart(data.sensitivityData), 0);
 }
 
-function initChartWithRetry(chartId, createChartFunc, retryCount) {
+function createChartWithRetry(chartId, createChartFunc, retryCount) {
     const canvas = document.getElementById(chartId);
     if (canvas) {
         const ctx = canvas.getContext('2d');
@@ -46,8 +51,8 @@ function initChartWithRetry(chartId, createChartFunc, retryCount) {
             console.error(`Unable to get 2D context for ${chartId}`);
         }
     } else if (retryCount < MAX_RETRIES) {
-        console.log(`Retrying ${chartId} initialization. Attempt ${retryCount + 1}`);
-        setTimeout(() => initChartWithRetry(chartId, createChartFunc, retryCount + 1), RETRY_DELAY);
+        console.log(`Retrying ${chartId} creation. Attempt ${retryCount + 1}`);
+        setTimeout(() => createChartWithRetry(chartId, createChartFunc, retryCount + 1), RETRY_DELAY);
     } else {
         console.error(`${chartId} element not found after ${MAX_RETRIES} attempts`);
     }

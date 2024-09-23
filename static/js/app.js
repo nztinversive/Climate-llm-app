@@ -16,7 +16,13 @@ document.addEventListener('DOMContentLoaded', () => {
     scenarioSelect.addEventListener('change', updateScenario);
     sensitivitySlider.addEventListener('input', updateSensitivity);
 
-    loadDefaultData();
+    initializeApplication();
+
+    function initializeApplication() {
+        setTimeout(() => {
+            loadDefaultData();
+        }, 500);
+    }
 
     function loadDefaultData() {
         console.log('Loading default data');
