@@ -2,6 +2,25 @@ let temperatureChart, economicChart, riskChart, scenarioChart, sensitivityChart;
 const MAX_RETRIES = 5;
 const RETRY_DELAY = 100; // milliseconds
 
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM content loaded, initializing charts');
+    loadDefaultData();
+});
+
+function loadDefaultData() {
+    console.log('Loading default data');
+    fetch('/api/get_default_data')
+        .then(response => response.json())
+        .then(data => {
+            console.log('Default data received:', data);
+            initCharts(data);
+        })
+        .catch(error => {
+            console.error('Error loading default data:', error);
+            showErrorMessage('Error loading default data. Please try refreshing the page.');
+        });
+}
+
 function initCharts(data) {
     console.log('Initializing charts with data:', data);
     if (!data) {
@@ -239,4 +258,9 @@ function updateSensitivityChart(data) {
         sensitivityChart.data.datasets[0].data = Object.values(data);
         sensitivityChart.update();
     }
+}
+
+function showErrorMessage(message) {
+    console.error(message);
+    alert(message);
 }

@@ -44,7 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(response => response.json())
         .then(processedData => {
             console.log('Processed data received:', processedData);
-            initCharts(processedData);
             updateCharts(processedData);
             saveSession(processedData);
         })
@@ -123,14 +122,40 @@ document.addEventListener('DOMContentLoaded', () => {
         return data;
     }
 
-    // Other functions (generateReport, runAdvancedAnalytics, updateScenario, updateSensitivity) remain the same
+    function generateReport() {
+        console.log('Generating report...');
+        alert('Report generated! This is a placeholder.');
+    }
+
+    function runAdvancedAnalytics() {
+        console.log('Running advanced analytics...');
+        alert('Advanced analytics completed! This is a placeholder.');
+    }
+
+    function updateScenario() {
+        console.log('Updating scenario...');
+        alert('Scenario updated! This is a placeholder.');
+    }
+
+    function updateSensitivity() {
+        console.log('Updating sensitivity...');
+        alert('Sensitivity updated! This is a placeholder.');
+    }
+
+    function showErrorMessage(message) {
+        console.error(message);
+        alert(message);
+    }
+
+    function saveSession(data) {
+        console.log('Saving session data:', data);
+    }
 });
 
 function getLLMResponses() {
     return JSON.parse(localStorage.getItem('llmResponses') || '[]');
 }
 
-// Helper functions to get chart data
 function getTemperatureData() {
     return temperatureChart ? temperatureChart.data.datasets[0].data.map((temp, index) => ({
         year: temperatureChart.data.labels[index],
