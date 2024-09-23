@@ -223,7 +223,7 @@ function updateScenarioChart(scenarioData) {
 }
 
 function updateSensitivityChart(sensitivityData) {
-    console.log('Updating sensitivity chart with data:', sensitivityData);
+    console.log('Updating sensitivity chart with data:', JSON.stringify(sensitivityData, null, 2));
 
     if (!sensitivityData || typeof sensitivityData !== 'object') {
         console.error('Invalid sensitivity data:', sensitivityData);
@@ -237,6 +237,8 @@ function updateSensitivityChart(sensitivityData) {
         sensitivityData.adaptation_sensitivity,
         sensitivityData.technology_sensitivity
     ];
+
+    console.log('Parsed sensitivity data:', data);
 
     const labels = [
         'Temperature Change',
@@ -262,9 +264,10 @@ function updateSensitivityChart(sensitivityData) {
         text: 'Sensitivity Impact'
     };
 
+    console.log('Updating sensitivity chart with new data');
     sensitivityChart.update();
 
-    console.log('Sensitivity chart updated with data:', data);
+    console.log('Sensitivity chart updated successfully');
 }
 
 function getTemperatureData() {

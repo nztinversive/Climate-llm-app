@@ -174,6 +174,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const sensitivityValue = parseInt(sensitivitySlider.value);
         const economicData = getEconomicData();
         
+        console.log('Updating sensitivity. Slider value:', sensitivityValue);
+        console.log('Economic data:', economicData);
+        
         if (!economicData || economicData.length === 0) {
             console.error('No economic data available for sensitivity analysis');
             showErrorMessage('No economic data available for sensitivity analysis');
@@ -195,6 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
             body: JSON.stringify(data)
         })
         .then(response => {
+            console.log('Received response from server:', response);
             if (!response.ok) {
                 return response.json().then(errorData => {
                     throw new Error(errorData.error || 'Network response was not ok');
@@ -216,6 +220,8 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error updating sensitivity:', error);
             showErrorMessage('An error occurred while updating the sensitivity: ' + error.message);
         });
+
+        sensitivitySlider.disabled = false;
     }
 
     function saveSession(data) {
