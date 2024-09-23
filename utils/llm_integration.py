@@ -16,11 +16,10 @@ def get_llm_response(query):
                     "content": query,
                 }
             ],
-            model="llama2-70b-4096",
+            model="mixtral-8x7b-32768",
             max_tokens=1024,
         )
         return chat_completion.choices[0].message.content
     except Exception as e:
         print(f"Error in LLM API call: {str(e)}")
         return "I apologize, but I'm having trouble processing your request at the moment. Please try again later."
-
