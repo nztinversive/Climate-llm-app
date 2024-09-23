@@ -14,7 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
     scenarioSelect.addEventListener('change', updateScenario);
     sensitivitySlider.addEventListener('input', updateSensitivity);
 
-    // Load default data when the page loads
     loadDefaultData();
 
     function loadDefaultData() {
@@ -162,13 +161,17 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .then(response => response.json())
         .then(updatedScenario => {
-            updateScenarioChart(updatedScenario);
+            if (updatedScenario && updatedScenario[selectedScenario]) {
+                updateScenarioChart(updatedScenario[selectedScenario]);
+            } else {
+                console.error('Invalid scenario data received:', updatedScenario);
+            }
         })
         .catch(error => console.error('Error updating scenario:', error));
     }
 
     function updateSensitivity() {
-        const sensitivityValue = sensitivitySlider.value;
+        const sensitivityValue = parseInt(sensitivitySlider.value);
         const data = {
             economicData: getEconomicData(),
             sensitivity: sensitivityValue
@@ -183,7 +186,11 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .then(response => response.json())
         .then(updatedSensitivity => {
-            updateSensitivityChart(updatedSensitivity);
+            if (updatedSensitivity) {
+                updateSensitivityChart(updatedSensitivity);
+            } else {
+                console.error('Invalid sensitivity data received:', updatedSensitivity);
+            }
         })
         .catch(error => console.error('Error updating sensitivity:', error));
     }

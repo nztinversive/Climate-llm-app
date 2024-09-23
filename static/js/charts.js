@@ -159,7 +159,7 @@ function updateTemperatureChart(data) {
 
 function updateEconomicChart(data) {
     economicChart.data.labels = data.map(d => d.year);
-    economicChart.data.datasets[0].data = data.map(d => d.impact * 100); // Convert to percentage
+    economicChart.data.datasets[0].data = data.map(d => d.impact * 100);
     economicChart.update();
 }
 
@@ -174,21 +174,31 @@ function updateRiskChart(data) {
     riskChart.update();
 }
 
-function updateScenarioChart(data) {
-    scenarioChart.data.labels = data.baseline.map(d => d.year);
-    scenarioChart.data.datasets[0].data = data.baseline.map(d => d.temperature);
-    scenarioChart.data.datasets[1].data = data.optimistic.map(d => d.temperature);
-    scenarioChart.data.datasets[2].data = data.pessimistic.map(d => d.temperature);
+function updateScenarioChart(scenarioData) {
+    if (!scenarioData || !Array.isArray(scenarioData)) {
+        console.error('Invalid scenario data:', scenarioData);
+        return;
+    }
+
+    scenarioChart.data.labels = scenarioData.map(d => d.year);
+    scenarioChart.data.datasets[0].data = scenarioData.map(d => d.temperature);
+
     scenarioChart.update();
 }
 
-function updateSensitivityChart(data) {
+function updateSensitivityChart(sensitivityData) {
+    if (!sensitivityData || typeof sensitivityData !== 'object') {
+        console.error('Invalid sensitivity data:', sensitivityData);
+        return;
+    }
+
     sensitivityChart.data.datasets[0].data = [
-        data.temperature_sensitivity,
-        data.economic_growth_sensitivity,
-        data.adaptation_sensitivity,
-        data.technology_sensitivity
+        sensitivityData.temperature_sensitivity,
+        sensitivityData.economic_growth_sensitivity,
+        sensitivityData.adaptation_sensitivity,
+        sensitivityData.technology_sensitivity
     ];
+
     sensitivityChart.update();
 }
 
@@ -202,7 +212,7 @@ function getTemperatureData() {
 function getEconomicData() {
     return economicChart.data.datasets[0].data.map((value, index) => ({
         year: economicChart.data.labels[index],
-        impact: value / 100 // Convert back to decimal
+        impact: value / 100
     }));
 }
 

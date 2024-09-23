@@ -94,9 +94,14 @@ def api_advanced_analytics():
 @app.route('/api/update_scenario', methods=['POST'])
 def api_update_scenario():
     try:
-        data = request.json or session['data']
+        data = request.json or session.get('data', {})
         scenario_type = data.get('scenario', 'baseline')
-        updated_scenario = generate_scenarios(data, scenario_type)
+        temperature_data = data.get('temperatureData', [])
+        
+        if not temperature_data:
+            return jsonify({'error': 'No temperature data provided'}), 400
+
+        updated_scenario = generate_scenarios({'temperatureData': temperature_data}, scenario_type)
         return jsonify(updated_scenario)
     except Exception as e:
         return jsonify({'error': str(e)}), 400
@@ -104,9 +109,14 @@ def api_update_scenario():
 @app.route('/api/update_sensitivity', methods=['POST'])
 def api_update_sensitivity():
     try:
-        data = request.json or session['data']
+        data = request.json or session.get('data', {})
         sensitivity_value = data.get('sensitivity', 50)
-        updated_sensitivity = perform_sensitivity_analysis(data, sensitivity_value)
+        economic_data = data.get('economicData', [])
+        
+        if not economic_data:
+            return jsonify({'error': 'No economic data provided'}), 400
+
+        updated_sensitivity = perform_sensitivity_analysis({'economicData': economic_data}, sensitivity_value)
         return jsonify(updated_sensitivity)
     except Exception as e:
         return jsonify({'error': str(e)}), 400
