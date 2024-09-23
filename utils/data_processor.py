@@ -100,6 +100,15 @@ def perform_sensitivity_analysis(data, sensitivity_value=50):
             'technology_sensitivity': 0
         }
     
+    if base_economic_value is None:
+        logging.error("Base economic value is None")
+        return {
+            'temperature_sensitivity': 0,
+            'economic_growth_sensitivity': 0,
+            'adaptation_sensitivity': 0,
+            'technology_sensitivity': 0
+        }
+    
     logging.info(f"Base economic value for sensitivity analysis: {base_economic_value}")
     
     sensitivities = {

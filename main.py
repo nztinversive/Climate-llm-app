@@ -127,7 +127,8 @@ def api_update_sensitivity():
         if not economic_data:
             raise ValueError("Economic data is missing or empty")
 
-        logging.info(f"Performing sensitivity analysis. Sensitivity: {sensitivity_value}, Economic data: {json.dumps(economic_data)}")
+        logging.info(f"Performing sensitivity analysis. Sensitivity: {sensitivity_value}")
+        logging.info(f"Economic data structure: {json.dumps(economic_data, indent=2)}")
 
         updated_sensitivity = perform_sensitivity_analysis({'economicData': economic_data}, sensitivity_value)
         
