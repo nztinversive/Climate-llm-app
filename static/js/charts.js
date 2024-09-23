@@ -175,15 +175,39 @@ function updateRiskChart(data) {
 }
 
 function updateScenarioChart(scenarioData) {
+    console.log('Received scenario data:', JSON.stringify(scenarioData, null, 2));
+
     if (!scenarioData || !Array.isArray(scenarioData)) {
         console.error('Invalid scenario data:', scenarioData);
+        showErrorMessage('Invalid scenario data received');
         return;
     }
 
-    scenarioChart.data.labels = scenarioData.map(d => d.year);
-    scenarioChart.data.datasets[0].data = scenarioData.map(d => d.temperature);
+    if (scenarioData.length === 0) {
+        console.warn('Empty scenario data received');
+        showErrorMessage('No scenario data available');
+        return;
+    }
 
-    scenarioChart.update();
+    try {
+        const years = scenarioData.map(d => {
+            if (!d.year) throw new Error('Missing year in scenario data');
+            return d.year;
+        });
+        const temperatures = scenarioData.map(d => {
+            if (d.temperature === undefined || d.temperature === null) throw new Error('Missing temperature in scenario data');
+            return d.temperature;
+        });
+
+        scenarioChart.data.labels = years;
+        scenarioChart.data.datasets[0].data = temperatures;
+
+        scenarioChart.update();
+        console.log('Scenario chart updated successfully');
+    } catch (error) {
+        console.error('Error updating scenario chart:', error);
+        showErrorMessage(`Error updating scenario chart: ${error.message}`);
+    }
 }
 
 function updateSensitivityChart(sensitivityData) {
@@ -264,4 +288,24 @@ function getSensitivityData() {
         adaptation_sensitivity: data[2],
         technology_sensitivity: data[3]
     };
+}
+
+function showErrorMessage(message) {
+    const errorDiv = document.createElement('div');
+    errorDiv.textContent = message;
+    errorDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #f44336;
+        color: white;
+        padding: 15px;
+        border-radius: 5px;
+        z-index: 1000;
+    `;
+    document.body.appendChild(errorDiv);
+    setTimeout(() => {
+        errorDiv.remove();
+    }, 5000);
 }
