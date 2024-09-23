@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const sensitivitySlider = document.getElementById('sensitivitySlider');
 
     importBtn.addEventListener('click', () => fileInput.click());
-    // Implement importData function
     fileInput.addEventListener('change', importData);
     exportBtn.addEventListener('click', exportData);
     generateReportBtn.addEventListener('click', generateReport);
@@ -84,6 +83,27 @@ document.addEventListener('DOMContentLoaded', () => {
         reader.readAsText(file);
     }
 
+    function exportData() {
+        const data = {
+            temperatureData: getTemperatureData(),
+            economicData: getEconomicData(),
+            riskMetrics: getRiskMetrics(),
+            scenarioData: getScenarioData(),
+            sensitivityData: getSensitivityData()
+        };
+
+        const jsonData = JSON.stringify(data, null, 2);
+        const blob = new Blob([jsonData], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'climate_economic_data.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
     function parseCSV(content) {
         const lines = content.split('\n');
         const headers = lines[0].split(',');
@@ -103,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return data;
     }
 
-    // Rest of the functions remain the same...
+    // Other functions (generateReport, runAdvancedAnalytics, updateScenario, updateSensitivity) remain the same
 });
 
 function getLLMResponses() {
