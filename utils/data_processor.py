@@ -109,10 +109,10 @@ def perform_sensitivity_analysis(data, sensitivity_value=50):
             'technology_sensitivity': max(0.1, sensitivity_factor * 1.5) * base_economic_value
         }
         
-        logging.info(f"Sensitivity analysis result: {json.dumps(sensitivities, indent=2)}")
+        logging.info(f"Calculated sensitivities: {json.dumps(sensitivities, indent=2)}")
         return sensitivities
 
-    except (ValueError, TypeError, IndexError) as e:
+    except Exception as e:
         logging.error(f"Error in sensitivity analysis: {str(e)}", exc_info=True)
         return {
             'temperature_sensitivity': 0.1,

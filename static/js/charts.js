@@ -240,6 +240,12 @@ function updateSensitivityChart(sensitivityData) {
 
     console.log('Parsed sensitivity data:', data);
 
+    if (data.some(value => typeof value !== 'number' || isNaN(value))) {
+        console.error('Invalid numerical values in sensitivity data:', data);
+        showErrorMessage('Invalid numerical values in sensitivity data');
+        return;
+    }
+
     const labels = [
         'Temperature Change',
         'Economic Growth',
