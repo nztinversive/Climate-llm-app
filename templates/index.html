@@ -39,14 +39,59 @@
             </div>
         </div>
         
-        <!-- Rest of the content remains unchanged -->
+        <!-- Chart Containers -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-primary">Temperature Trends</h2>
+                <div id="temperatureChart" class="chart-container"></div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-primary">Economic Impact</h2>
+                <div id="economicChart" class="chart-container"></div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-primary">Risk Assessment</h2>
+                <div id="riskChart" class="chart-container"></div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-primary">Temperature Scenarios</h2>
+                <div id="scenarioChart" class="chart-container"></div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-primary">Economic Sensitivity</h2>
+                <div id="sensitivityChart" class="chart-container"></div>
+            </div>
+        </div>
         
+        <!-- Controls Section -->
+        <div class="mt-8 bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold mb-4 text-primary">Controls</h2>
+            <div class="flex flex-wrap gap-4">
+                <button id="importBtn" class="bg-primary text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">Import Data</button>
+                <button id="exportBtn" class="bg-primary text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">Export Data</button>
+                <button id="generateReportBtn" class="bg-primary text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">Generate Report</button>
+                <button id="runAdvancedAnalyticsBtn" class="bg-primary text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">Run Advanced Analytics</button>
+            </div>
+            <div class="mt-4">
+                <label for="scenarioSelect" class="block text-sm font-medium text-gray-700">Select Scenario:</label>
+                <select id="scenarioSelect" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md">
+                    <option value="baseline">Baseline</option>
+                    <option value="optimistic">Optimistic</option>
+                    <option value="pessimistic">Pessimistic</option>
+                </select>
+            </div>
+            <div class="mt-4">
+                <label for="sensitivitySlider" class="block text-sm font-medium text-gray-700">Sensitivity Analysis:</label>
+                <input type="range" id="sensitivitySlider" min="0" max="100" value="50" class="w-full">
+            </div>
+            <input type="file" id="fileInput" class="hidden" accept=".json,.csv">
+        </div>
     </main>
 
     {% include 'components/footer.html' with context %}
 
-    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
     <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
     <script src="{{ url_for('static', filename='js/llm.js') }}"></script>
 </body>
 </html>
