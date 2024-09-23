@@ -4,10 +4,14 @@ from utils.llm_integration import get_llm_response
 from utils.replit_db import ReplitDB
 import json
 import os
+import logging
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  # Set a secret key for session management
 db = ReplitDB()
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 
 @app.route('/')
 def index():
@@ -109,17 +113,29 @@ def api_update_scenario():
 @app.route('/api/update_sensitivity', methods=['POST'])
 def api_update_sensitivity():
     try:
-        data = request.json or session.get('data', {})
-        sensitivity_value = data.get('sensitivity', 50)
-        economic_data = data.get('economicData', [])
-        
+        data = request.json
+        if not data:
+            raise ValueError("No data provided in the request")
+
+        sensitivity_value = data.get('sensitivity')
+        economic_data = data.get('economicData')
+
+        if sensitivity_value is None:
+            raise ValueError("Sensitivity value is missing")
         if not economic_data:
-            return jsonify({'error': 'No economic data provided'}), 400
+            raise ValueError("Economic data is missing or empty")
+
+        logging.info(f"Received sensitivity update request. Sensitivity: {sensitivity_value}, Economic data length: {len(economic_data)}")
 
         updated_sensitivity = perform_sensitivity_analysis({'economicData': economic_data}, sensitivity_value)
+        
+        logging.info(f"Sensitivity analysis completed. Result: {updated_sensitivity}")
+
         return jsonify(updated_sensitivity)
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        error_message = str(e)
+        logging.error(f"Error in update_sensitivity: {error_message}")
+        return jsonify({'error': error_message}), 400
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

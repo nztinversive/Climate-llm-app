@@ -192,14 +192,22 @@ function updateSensitivityChart(sensitivityData) {
         return;
     }
 
-    sensitivityChart.data.datasets[0].data = [
+    const data = [
         sensitivityData.temperature_sensitivity,
         sensitivityData.economic_growth_sensitivity,
         sensitivityData.adaptation_sensitivity,
         sensitivityData.technology_sensitivity
     ];
 
+    sensitivityChart.data.datasets[0].data = data;
+
+    if (sensitivityData.labels && Array.isArray(sensitivityData.labels)) {
+        sensitivityChart.data.labels = sensitivityData.labels;
+    }
+
     sensitivityChart.update();
+
+    console.log('Sensitivity chart updated with data:', data);
 }
 
 function getTemperatureData() {

@@ -184,15 +184,23 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             body: JSON.stringify(data)
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
         .then(updatedSensitivity => {
-            if (updatedSensitivity) {
+            if (updatedSensitivity && typeof updatedSensitivity === 'object') {
                 updateSensitivityChart(updatedSensitivity);
             } else {
                 console.error('Invalid sensitivity data received:', updatedSensitivity);
             }
         })
-        .catch(error => console.error('Error updating sensitivity:', error));
+        .catch(error => {
+            console.error('Error updating sensitivity:', error);
+            alert('An error occurred while updating the sensitivity. Please try again.');
+        });
     }
 
     function saveSession(data) {
