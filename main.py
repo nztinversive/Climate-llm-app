@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 from utils.data_processor import process_data, export_data
-from utils.llm_simulator import simulate_llm_response
+from utils.llm_integration import get_llm_response
 from utils.replit_db import ReplitDB
 import json
 
@@ -27,7 +27,7 @@ def api_export_data():
 @app.route('/api/llm_query', methods=['POST'])
 def api_llm_query():
     query = request.json['query']
-    response = simulate_llm_response(query)
+    response = get_llm_response(query)
     return jsonify({'response': response})
 
 @app.route('/api/save_session', methods=['POST'])
