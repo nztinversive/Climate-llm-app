@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Climate Economic Modeling Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+</head>
+<body class="bg-gray-100">
+    {% include 'components/header.html' %}
+
+    <main class="container mx-auto mt-8 p-4">
+        <h1 class="text-3xl font-bold mb-4">Climate Economic Modeling Tool</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-white p-4 rounded shadow">
+                <h2 class="text-xl font-semibold mb-2">Data Import/Export</h2>
+                <input type="file" id="fileInput" accept=".csv,.json" class="mb-2">
+                <button id="importBtn" class="bg-blue-500 text-white px-4 py-2 rounded">Import</button>
+                <button id="exportBtn" class="bg-green-500 text-white px-4 py-2 rounded ml-2">Export</button>
+            </div>
+            
+            <div class="bg-white p-4 rounded shadow">
+                <h2 class="text-xl font-semibold mb-2">LLM Query</h2>
+                <input type="text" id="llmQuery" placeholder="Ask a question..." class="w-full p-2 border rounded mb-2">
+                <button id="llmQueryBtn" class="bg-purple-500 text-white px-4 py-2 rounded">Query</button>
+                <div id="llmResponse" class="mt-2"></div>
+            </div>
+        </div>
+        
+        <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-white p-4 rounded shadow">
+                <h2 class="text-xl font-semibold mb-2">Temperature Trend</h2>
+                <canvas id="temperatureChart"></canvas>
+            </div>
+            
+            <div class="bg-white p-4 rounded shadow">
+                <h2 class="text-xl font-semibold mb-2">Economic Impact</h2>
+                <canvas id="economicChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="mt-8">
+            <button id="generateReportBtn" class="bg-red-500 text-white px-4 py-2 rounded">Generate Report</button>
+        </div>
+    </main>
+
+    {% include 'components/footer.html' %}
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/llm.js') }}"></script>
+</body>
+</html>

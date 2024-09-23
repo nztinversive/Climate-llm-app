@@ -1,0 +1,6 @@
+/* Add any custom styles here */
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
