@@ -10,9 +10,9 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#3B82F6',
+                        primary: '#2563EB',
                         secondary: '#10B981',
-                        background: '#F3F4F6',
+                        background: '#F9FAFB',
                         card: '#FFFFFF',
                         text: '#1F2937',
                     }
@@ -53,12 +53,6 @@
                 <div class="bg-card p-6 rounded-lg shadow-lg">
                     <h2 class="text-2xl font-semibold mb-4 text-primary">Controls</h2>
                     <div class="grid grid-cols-2 gap-4">
-                        <button id="importBtn" class="bg-primary text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">
-                            <i class="fas fa-file-import mr-2"></i>Import
-                        </button>
-                        <button id="exportBtn" class="bg-secondary text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300">
-                            <i class="fas fa-file-export mr-2"></i>Export
-                        </button>
                         <button id="generateReportBtn" class="bg-primary text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">
                             <i class="fas fa-file-alt mr-2"></i>Report
                         </button>
@@ -84,7 +78,6 @@
                         <label for="sensitivitySlider" class="block text-sm font-medium text-gray-700">Sensitivity Analysis:</label>
                         <input type="range" id="sensitivitySlider" min="0" max="100" value="50" class="w-full">
                     </div>
-                    <input type="file" id="fileInput" class="hidden" accept=".json,.csv">
                 </div>
             </div>
 
