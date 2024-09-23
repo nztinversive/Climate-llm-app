@@ -11,7 +11,7 @@ app.secret_key = os.urandom(24)  # Set a secret key for session management
 db = ReplitDB()
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 @app.route('/')
 def index():
@@ -114,6 +114,8 @@ def api_update_scenario():
 def api_update_sensitivity():
     try:
         data = request.json
+        logging.info(f"Received sensitivity update request: {json.dumps(data)}")
+
         if not data:
             raise ValueError("No data provided in the request")
 
@@ -125,16 +127,16 @@ def api_update_sensitivity():
         if not economic_data:
             raise ValueError("Economic data is missing or empty")
 
-        logging.info(f"Received sensitivity update request. Sensitivity: {sensitivity_value}, Economic data length: {len(economic_data)}")
+        logging.info(f"Performing sensitivity analysis. Sensitivity: {sensitivity_value}, Economic data: {json.dumps(economic_data)}")
 
         updated_sensitivity = perform_sensitivity_analysis({'economicData': economic_data}, sensitivity_value)
         
-        logging.info(f"Sensitivity analysis completed. Result: {updated_sensitivity}")
+        logging.info(f"Sensitivity analysis completed. Result: {json.dumps(updated_sensitivity)}")
 
         return jsonify(updated_sensitivity)
     except Exception as e:
         error_message = str(e)
-        logging.error(f"Error in update_sensitivity: {error_message}")
+        logging.error(f"Error in update_sensitivity: {error_message}", exc_info=True)
         return jsonify({'error': error_message}), 400
 
 if __name__ == '__main__':

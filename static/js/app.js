@@ -172,10 +172,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateSensitivity() {
         const sensitivityValue = parseInt(sensitivitySlider.value);
+        const economicData = getEconomicData();
+        
+        if (!economicData || economicData.length === 0) {
+            console.error('No economic data available for sensitivity analysis');
+            alert('Error: No economic data available for sensitivity analysis');
+            return;
+        }
+        
         const data = {
-            economicData: getEconomicData(),
+            economicData: economicData,
             sensitivity: sensitivityValue
         };
+
+        console.log('Sending sensitivity update request:', data);
 
         fetch('/api/update_sensitivity', {
             method: 'POST',
@@ -186,20 +196,23 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .then(response => {
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                return response.json().then(errorData => {
+                    throw new Error(errorData.error || 'Network response was not ok');
+                });
             }
             return response.json();
         })
         .then(updatedSensitivity => {
             if (updatedSensitivity && typeof updatedSensitivity === 'object') {
                 updateSensitivityChart(updatedSensitivity);
+                console.log('Sensitivity chart updated with data:', updatedSensitivity);
             } else {
                 console.error('Invalid sensitivity data received:', updatedSensitivity);
             }
         })
         .catch(error => {
             console.error('Error updating sensitivity:', error);
-            alert('An error occurred while updating the sensitivity. Please try again.');
+            alert('An error occurred while updating the sensitivity: ' + error.message);
         });
     }
 

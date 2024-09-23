@@ -4,8 +4,8 @@ from scipy.stats import norm
 import json
 from io import StringIO
 import csv
+import logging
 
-# Sample dataset
 DEFAULT_DATA = {
     "temperatureData": [
         {"year": 2000, "temperature": 14.8},
@@ -34,18 +34,14 @@ def process_data(data):
     years = [entry["year"] for entry in temperature_data]
     temperatures = [entry["temperature"] for entry in temperature_data]
     
-    # Perform linear regression
     model = linear_regression_temperature(years, temperatures)
     
-    # Predict temperatures for the next 30 years
     future_years = list(range(max(years) + 1, max(years) + 31))
     future_temperatures = [predict_temperature(model, year) for year in future_years]
     
-    # Calculate economic impact
     base_temperature = temperatures[-1]
     economic_impacts = [calculate_economic_impact(temp - base_temperature) for temp in future_temperatures]
     
-    # Perform Monte Carlo simulation
     simulations = monte_carlo_simulation(1000, base_temperature, volatility=0.1)
     risk_metrics = calculate_risk_metrics(simulations)
     
@@ -79,10 +75,32 @@ def generate_scenarios(data, scenario_type='all'):
         return {scenario_type: scenarios[scenario_type]}
 
 def perform_sensitivity_analysis(data, sensitivity_value=50):
+    logging.info(f"Performing sensitivity analysis with data: {data}")
     if not data or 'economicData' not in data or not data['economicData']:
-        data = load_default_data()
+        logging.warning("No economic data provided for sensitivity analysis")
+        return {
+            'temperature_sensitivity': 0,
+            'economic_growth_sensitivity': 0,
+            'adaptation_sensitivity': 0,
+            'technology_sensitivity': 0
+        }
     
-    base_economic_impact = data['economicData'][-1]['gdp']
+    latest_economic_data = data['economicData'][-1]
+    
+    if 'gdp' in latest_economic_data:
+        base_economic_value = latest_economic_data['gdp']
+    elif 'impact' in latest_economic_data:
+        base_economic_value = latest_economic_data['impact']
+    else:
+        logging.error(f"No 'gdp' or 'impact' key found in economic data: {latest_economic_data}")
+        return {
+            'temperature_sensitivity': 0,
+            'economic_growth_sensitivity': 0,
+            'adaptation_sensitivity': 0,
+            'technology_sensitivity': 0
+        }
+    
+    logging.info(f"Base economic value for sensitivity analysis: {base_economic_value}")
     
     sensitivities = {
         'temperature_sensitivity': (sensitivity_value / 100) * 2,
@@ -91,12 +109,15 @@ def perform_sensitivity_analysis(data, sensitivity_value=50):
         'technology_sensitivity': (sensitivity_value / 100) * 1.8
     }
     
-    return {
-        'temperature_sensitivity': base_economic_impact * sensitivities['temperature_sensitivity'],
-        'economic_growth_sensitivity': base_economic_impact * sensitivities['economic_growth_sensitivity'],
-        'adaptation_sensitivity': base_economic_impact * sensitivities['adaptation_sensitivity'],
-        'technology_sensitivity': base_economic_impact * sensitivities['technology_sensitivity']
+    result = {
+        'temperature_sensitivity': base_economic_value * sensitivities['temperature_sensitivity'],
+        'economic_growth_sensitivity': base_economic_value * sensitivities['economic_growth_sensitivity'],
+        'adaptation_sensitivity': base_economic_value * sensitivities['adaptation_sensitivity'],
+        'technology_sensitivity': base_economic_value * sensitivities['technology_sensitivity']
     }
+    
+    logging.info(f"Sensitivity analysis result: {result}")
+    return result
 
 def export_data(data, format_type):
     if format_type == 'json':
@@ -105,13 +126,11 @@ def export_data(data, format_type):
         output = StringIO()
         writer = csv.writer(output)
         
-        # Write headers
         headers = set()
         for item in data:
             headers.update(item.keys())
         writer.writerow(headers)
         
-        # Write data
         for item in data:
             writer.writerow([item.get(header, '') for header in headers])
         
@@ -130,14 +149,13 @@ def predict_temperature(model, year):
     return model.predict([[year]])[0]
 
 def calculate_economic_impact(temperature_change):
-    # Assume 1°C increase leads to 1% GDP loss
     gdp_impact = -0.01 * temperature_change
     return gdp_impact
 
 def monte_carlo_simulation(num_simulations, base_temperature, volatility):
     simulations = []
     for _ in range(num_simulations):
-        annual_changes = norm.rvs(0, volatility, 30)  # Simulate 30 years
+        annual_changes = norm.rvs(0, volatility, 30)
         temperature_path = np.cumsum(annual_changes) + base_temperature
         simulations.append(temperature_path)
     return np.array(simulations)
