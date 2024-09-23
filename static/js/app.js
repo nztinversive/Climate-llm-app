@@ -14,6 +14,18 @@ document.addEventListener('DOMContentLoaded', () => {
     scenarioSelect.addEventListener('change', updateScenario);
     sensitivitySlider.addEventListener('input', updateSensitivity);
 
+    // Load default data when the page loads
+    loadDefaultData();
+
+    function loadDefaultData() {
+        fetch('/api/get_default_data')
+            .then(response => response.json())
+            .then(data => {
+                processData(data);
+            })
+            .catch(error => console.error('Error loading default data:', error));
+    }
+
     function importData() {
         const file = fileInput.files[0];
         if (!file) {

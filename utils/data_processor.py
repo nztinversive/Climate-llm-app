@@ -5,17 +5,31 @@ import json
 from io import StringIO
 import csv
 
+# Sample dataset
+DEFAULT_DATA = {
+    "temperatureData": [
+        {"year": 2000, "temperature": 14.8},
+        {"year": 2010, "temperature": 15.2},
+        {"year": 2020, "temperature": 15.5},
+        {"year": 2030, "temperature": 15.9}
+    ],
+    "economicData": [
+        {"year": 2000, "gdp": 33.6},
+        {"year": 2010, "gdp": 65.9},
+        {"year": 2020, "gdp": 84.5},
+        {"year": 2030, "gdp": 100.0}
+    ]
+}
+
+def load_default_data():
+    return DEFAULT_DATA
+
 def process_data(data):
-    # Use the provided data or generate sample data if not available
     if not data:
-        temperature_data = [
-            {"year": 2020, "temperature": 1.1},
-            {"year": 2030, "temperature": 1.5},
-            {"year": 2040, "temperature": 1.9},
-            {"year": 2050, "temperature": 2.3}
-        ]
-    else:
-        temperature_data = data.get("temperatureData", [])
+        data = load_default_data()
+    
+    temperature_data = data.get("temperatureData", [])
+    economic_data = data.get("economicData", [])
     
     years = [entry["year"] for entry in temperature_data]
     temperatures = [entry["temperature"] for entry in temperature_data]
@@ -37,22 +51,15 @@ def process_data(data):
     
     return {
         "temperatureData": temperature_data + [{"year": year, "temperature": temp} for year, temp in zip(future_years, future_temperatures)],
-        "economicData": [{"year": year, "impact": impact} for year, impact in zip(future_years, economic_impacts)],
+        "economicData": economic_data + [{"year": year, "gdp": impact} for year, impact in zip(future_years, economic_impacts)],
         "riskMetrics": risk_metrics
     }
 
 def generate_scenarios(data, scenario_type='all'):
     if not data or 'temperatureData' not in data or not data['temperatureData']:
-        # Generate sample data if input is empty or invalid
-        base_data = [
-            {'year': 2020, 'temperature': 1.1},
-            {'year': 2030, 'temperature': 1.5},
-            {'year': 2040, 'temperature': 1.9},
-            {'year': 2050, 'temperature': 2.3}
-        ]
-    else:
-        base_data = data['temperatureData']
+        data = load_default_data()
     
+    base_data = data['temperatureData']
     years = [entry['year'] for entry in base_data]
     base_temperatures = [entry['temperature'] for entry in base_data]
     
@@ -73,10 +80,9 @@ def generate_scenarios(data, scenario_type='all'):
 
 def perform_sensitivity_analysis(data, sensitivity_value=50):
     if not data or 'economicData' not in data or not data['economicData']:
-        # Generate sample data if input is empty or invalid
-        base_economic_impact = 0.05  # 5% impact as a default value
-    else:
-        base_economic_impact = data['economicData'][-1]['impact']
+        data = load_default_data()
+    
+    base_economic_impact = data['economicData'][-1]['gdp']
     
     sensitivities = {
         'temperature_sensitivity': (sensitivity_value / 100) * 2,
