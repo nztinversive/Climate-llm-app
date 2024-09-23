@@ -98,7 +98,7 @@
         </div>
     </main>
 
-    {% include 'components/footer.html' %}
+    {% include 'components/footer.html' with context %}
 
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
     <script src="{{ url_for('static', filename='js/charts.js') }}"></script>

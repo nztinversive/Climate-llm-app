@@ -103,7 +103,8 @@ def generate_report():
         'sensitivityData': sensitivity_data
     }
     
-    return render_template('report.html', report_data=report_data)
+    current_year = datetime.now().year
+    return render_template('report.html', report_data=report_data, current_year=current_year)
 
 @app.route('/api/advanced_analytics', methods=['POST'])
 def api_advanced_analytics():
