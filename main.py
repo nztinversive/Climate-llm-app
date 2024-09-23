@@ -52,8 +52,12 @@ def api_export_data():
 @app.route('/api/llm_query', methods=['POST'])
 def api_llm_query():
     query = request.json['query']
-    response = get_llm_response(query)
-    return jsonify({'response': response})
+    try:
+        response = get_llm_response(query)
+        return jsonify({'response': response})
+    except Exception as e:
+        logging.error(f"Error in LLM query: {str(e)}")
+        return jsonify({'error': 'An error occurred while processing your query.'}), 500
 
 @app.route('/api/save_session', methods=['POST'])
 def api_save_session():

@@ -2,8 +2,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const llmQueryBtn = document.getElementById('llmQueryBtn');
     const llmQuery = document.getElementById('llmQuery');
     const llmResponse = document.getElementById('llmResponse');
+    const llmResponseText = document.getElementById('llmResponseText');
 
     llmQueryBtn.addEventListener('click', performLLMQuery);
+    llmQuery.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            performLLMQuery();
+        }
+    });
 
     function performLLMQuery() {
         const query = llmQuery.value.trim();
@@ -11,6 +17,12 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Please enter a query.');
             return;
         }
+
+        // Show loading state
+        llmResponseText.textContent = 'Thinking...';
+        llmResponse.classList.remove('hidden');
+        llmQueryBtn.disabled = true;
+        llmQueryBtn.textContent = 'Processing...';
 
         fetch('/api/llm_query', {
             method: 'POST',
@@ -21,12 +33,16 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .then(response => response.json())
         .then(data => {
-            llmResponse.innerHTML = `<p><strong>Response:</strong> ${data.response}</p>`;
+            llmResponseText.textContent = data.response;
             saveLLMResponse(query, data.response);
         })
         .catch(error => {
             console.error('Error performing LLM query:', error);
-            llmResponse.innerHTML = '<p>Error processing your query. Please try again.</p>';
+            llmResponseText.textContent = 'Error processing your query. Please try again.';
+        })
+        .finally(() => {
+            llmQueryBtn.disabled = false;
+            llmQueryBtn.textContent = 'Ask';
         });
     }
 
