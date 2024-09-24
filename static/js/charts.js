@@ -1,5 +1,7 @@
+// Global variables to store chart instances
 let temperatureChart, economicChart, riskChart, scenarioChart, sensitivityChart;
 
+// Initialize charts by loading default data
 function initCharts() {
     console.log('Initializing charts');
     try {
@@ -10,6 +12,7 @@ function initCharts() {
     }
 }
 
+// Fetch default data from the server
 function loadDefaultData() {
     console.log('Loading default data');
     fetch('/api/get_default_data')
@@ -29,6 +32,7 @@ function loadDefaultData() {
         });
 }
 
+// Create all charts using the provided data
 function createCharts(data) {
     console.log('Creating charts with data:', JSON.stringify(data, null, 2));
     if (!data) {
@@ -36,6 +40,7 @@ function createCharts(data) {
         return;
     }
 
+    // Create or update each chart
     createOrUpdateChart('temperatureChart', () => createTemperatureChart(data.temperatureData));
     createOrUpdateChart('economicChart', () => createEconomicChart(data.economicData));
     createOrUpdateChart('riskChart', () => createRiskChart(data.riskMetrics));
@@ -43,6 +48,7 @@ function createCharts(data) {
     createOrUpdateChart('sensitivityChart', () => createSensitivityChart(data.sensitivityData));
 }
 
+// Helper function to create or update a chart
 function createOrUpdateChart(chartId, createChartFunction) {
     const container = document.getElementById(chartId);
     if (!container) {
@@ -66,6 +72,7 @@ function createOrUpdateChart(chartId, createChartFunction) {
     }
 }
 
+// Create temperature chart
 function createTemperatureChart(data) {
     console.log('Creating Temperature Chart with data:', JSON.stringify(data, null, 2));
     if (!data || !Array.isArray(data) || data.length === 0) {
@@ -103,6 +110,7 @@ function createTemperatureChart(data) {
     });
 }
 
+// Create economic chart
 function createEconomicChart(data) {
     console.log('Creating Economic Chart');
     const canvas = document.getElementById('economicChartCanvas');
@@ -143,6 +151,7 @@ function createEconomicChart(data) {
     }
 }
 
+// Create risk assessment chart
 function createRiskChart(data) {
     console.log('Creating Risk Chart');
     const canvas = document.getElementById('riskChartCanvas');
@@ -184,6 +193,7 @@ function createRiskChart(data) {
     }
 }
 
+// Create scenario comparison chart
 function createScenarioChart(data) {
     console.log('Creating Scenario Chart');
     const canvas = document.getElementById('scenarioChartCanvas');
@@ -226,6 +236,7 @@ function createScenarioChart(data) {
     }
 }
 
+// Create sensitivity analysis chart
 function createSensitivityChart(data) {
     console.log('Creating Sensitivity Chart');
     const canvas = document.getElementById('sensitivityChartCanvas');
@@ -271,6 +282,7 @@ function createSensitivityChart(data) {
     }
 }
 
+// Helper function to create a table from data
 function createTable(data, headers, rowDataFunction = null) {
     let tableHTML = '<table class="w-full text-left border-collapse">';
     tableHTML += '<thead><tr>' + headers.map(h => `<th class="p-2 border">${h}</th>`).join('') + '</tr></thead>';
@@ -285,6 +297,7 @@ function createTable(data, headers, rowDataFunction = null) {
     return tableHTML;
 }
 
+// Helper function to get color for different scenarios
 function getScenarioColor(scenario) {
     switch (scenario) {
         case 'baseline': return 'rgb(75, 192, 192)';
@@ -294,6 +307,7 @@ function getScenarioColor(scenario) {
     }
 }
 
+// Update all charts with new data
 function updateCharts(data) {
     console.log('Updating charts with data:', data);
     if (!data) {
@@ -308,11 +322,13 @@ function updateCharts(data) {
     createSensitivityChart(data.sensitivityData);
 }
 
+// Display error message to the user
 function showErrorMessage(message) {
     console.error('Error:', message);
     alert(message);
 }
 
+// Update scenario chart based on user selection
 function updateScenarioChart(scenarioType) {
     console.log('Updating Scenario Chart for:', scenarioType);
     fetch('/api/update_scenario', {
@@ -322,7 +338,7 @@ function updateScenarioChart(scenarioType) {
         },
         body: JSON.stringify({ 
             scenario: scenarioType,
-            temperatureData: getTemperatureData()  // Add this line to send current temperature data
+            temperatureData: getTemperatureData()
         })
     })
     .then(response => {
@@ -361,9 +377,9 @@ function updateScenarioChart(scenarioType) {
     });
 }
 
+// Update sensitivity chart based on user input
 function updateSensitivityChart(sensitivityValue) {
     console.log('Updating Sensitivity Chart with value:', sensitivityValue);
-    // Get the current economic data from the economic chart
     const economicData = getEconomicData();
     
     fetch('/api/update_sensitivity', {
@@ -397,7 +413,7 @@ function updateSensitivityChart(sensitivityValue) {
     });
 }
 
-// Add this function to get economic data from the economic chart
+// Helper function to get economic data from the chart
 function getEconomicData() {
     if (economicChart) {
         return economicChart.data.labels.map((year, index) => ({
@@ -408,7 +424,7 @@ function getEconomicData() {
     return [];
 }
 
-// Add these new functions
+// Generate summary of the current data
 function generateSummary() {
     const data = {
         temperatureData: getTemperatureData(),
@@ -436,6 +452,7 @@ function generateSummary() {
     });
 }
 
+// Compare different scenarios
 function compareScenarios() {
     const scenarioData = getScenarioData();
 
@@ -458,6 +475,7 @@ function compareScenarios() {
     });
 }
 
+// Helper function to create a comparison table
 function createComparisonTable(data) {
     let tableHTML = '<table class="w-full text-left border-collapse">';
     
@@ -474,3 +492,6 @@ function createComparisonTable(data) {
     
     return tableHTML;
 }
+
+// Note: The following functions (getTemperatureData, getRiskMetrics, getScenarioData, getSensitivityData)
+// are assumed to be defined elsewhere in the code or in another file.

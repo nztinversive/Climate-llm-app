@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM content loaded, setting up event listeners');
 
+    // Object to store references to DOM elements
     const elements = {
         generateReportBtn: document.getElementById('generateReportBtn'),
         runAdvancedAnalyticsBtn: document.getElementById('runAdvancedAnalyticsBtn'),
@@ -11,7 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
         loading: document.getElementById('loading')
     };
 
-    // Check if elements exist before adding event listeners
+    // Attach event listeners to DOM elements if they exist
+    // This prevents errors if elements are missing from the DOM
     if (elements.generateReportBtn) {
         elements.generateReportBtn.addEventListener('click', generateReport);
     }
@@ -39,12 +41,15 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeApplication();
 
     // Function definitions
+
+    // Shows the loading indicator
     function showLoading() {
         if (elements.loading) {
             elements.loading.style.display = 'flex';
         }
     }
 
+    // Hides the loading indicator
     function hideLoading() {
         if (elements.loading) {
             elements.loading.style.display = 'none';
@@ -52,6 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Wrap all fetch calls with showLoading and hideLoading
+    // This ensures the loading indicator is shown for all API calls
     const originalFetch = window.fetch;
     window.fetch = function() {
         showLoading();
@@ -65,11 +71,13 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 });
 
+// Initialize the application, including setting up charts
 function initializeApplication() {
     console.log('Initializing application');
     initCharts();
 }
 
+// Load default data from the server and create initial charts
 function loadDefaultData() {
     console.log('Loading default data');
     fetch('/api/get_default_data')
@@ -82,6 +90,7 @@ function loadDefaultData() {
         .then(data => {
             console.log('Default data received:', JSON.stringify(data, null, 2));
             console.log('Data structure:', Object.keys(data));
+            // Validate the received data
             if (!data.temperatureData || !Array.isArray(data.temperatureData)) {
                 throw new Error('Invalid or missing temperature data in the response');
             }
@@ -96,6 +105,7 @@ function loadDefaultData() {
         });
 }
 
+// Process data by sending it to the server for analysis
 function processData(data) {
     console.log('Processing data:', data);
     fetch('/api/process_data', {
@@ -122,6 +132,7 @@ function processData(data) {
     });
 }
 
+// Handle data import from file (JSON or CSV)
 function importData(event) {
     const file = event.target.files[0];
     if (!file) {
@@ -151,6 +162,7 @@ function importData(event) {
     reader.readAsText(file);
 }
 
+// Export current application data to a JSON file
 function exportData() {
     const data = {
         temperatureData: getTemperatureData(),
@@ -172,6 +184,7 @@ function exportData() {
     URL.revokeObjectURL(url);
 }
 
+// Parse CSV content into a structured data object
 function parseCSV(content) {
     const lines = content.split('\n');
     const headers = lines[0].split(',');
@@ -191,6 +204,7 @@ function parseCSV(content) {
     return data;
 }
 
+// Placeholder functions for future implementation
 function generateReport() {
     console.log('Generating report...');
     alert('Report generated! This is a placeholder.');
@@ -211,19 +225,24 @@ function updateSensitivity() {
     alert('Sensitivity updated! This is a placeholder.');
 }
 
+// Display error messages to the user
 function showErrorMessage(message) {
     console.error('Error:', message);
     alert(message);
 }
 
+// Save current session data (to be implemented)
 function saveSession(data) {
     console.log('Saving session data:', data);
     // Implement session saving logic here
 }
 
+// Retrieve LLM responses from local storage
 function getLLMResponses() {
     return JSON.parse(localStorage.getItem('llmResponses') || '[]');
 }
+
+// Helper functions to extract data from charts
 
 function getTemperatureData() {
     return temperatureChart ? temperatureChart.data.datasets[0].data.map((temp, index) => ({
@@ -276,6 +295,8 @@ function getSensitivityData() {
     return {};
 }
 
+// Event handlers for user interactions
+
 function handleScenarioChange(event) {
     const selectedScenario = event.target.value;
     console.log('Scenario changed to:', selectedScenario);
@@ -288,6 +309,8 @@ function handleSensitivityChange(event) {
     updateSensitivityChart(sensitivityValue);
 }
 
+// Loading indicator functions
+
 function showLoading() {
     document.getElementById('loading').style.display = 'flex';
 }
@@ -297,6 +320,7 @@ function hideLoading() {
 }
 
 // Wrap all fetch calls with showLoading and hideLoading
+// This ensures consistent loading behavior across the application
 const originalFetch = window.fetch;
 window.fetch = function() {
     showLoading();

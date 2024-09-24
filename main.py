@@ -1,3 +1,4 @@
+# Import necessary modules and custom utilities
 from flask import Flask, render_template, request, jsonify, session
 from utils.data_processor import process_data, export_data, generate_scenarios, perform_sensitivity_analysis, load_default_data
 from utils.llm_integration import get_llm_response
@@ -9,20 +10,24 @@ import traceback
 from datetime import datetime
 from typing import Dict, Any, Optional
 
+# Initialize Flask app and set up session management
 app = Flask(__name__)
-app.secret_key = os.urandom(24)  # Set a secret key for session management
+app.secret_key = os.urandom(24)  # Generate a random secret key for secure sessions
 db = ReplitDB()
 
-# Configure logging
+# Configure logging for better debugging and monitoring
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
+# Route for the landing page
 @app.route('/')
 def landing():
     return render_template('landing.html')
 
+# Route for the main dashboard
 @app.route('/dashboard')
 def dashboard():
     logging.info('Dashboard route accessed')
+    # Load default data if not present in the session
     if 'data' not in session:
         logging.info('Loading default data into session')
         session['data'] = load_default_data()
@@ -34,6 +39,7 @@ def dashboard():
     current_year = datetime.now().year
     return render_template('index.html', current_year=current_year)
 
+# API route to get default data
 @app.route('/api/get_default_data', methods=['GET'])
 def api_get_default_data():
     logging.info('Default data requested')
@@ -42,6 +48,7 @@ def api_get_default_data():
         session['data'] = load_default_data()
     data = session['data']
     logging.info(f'Returning default data: {json.dumps(data, indent=2)}')
+    # Return a structured response with all required data fields
     return jsonify({
         'temperatureData': data.get('temperatureData', []),
         'economicData': data.get('economicData', []),
@@ -50,6 +57,7 @@ def api_get_default_data():
         'sensitivityData': data.get('sensitivityData', {})
     })
 
+# API route to process data and generate scenarios and sensitivity analysis
 @app.route('/api/process_data', methods=['POST'])
 def api_process_data():
     data = request.json or session.get('data', {})
@@ -57,6 +65,7 @@ def api_process_data():
     scenario_data = generate_scenarios(processed_data)
     sensitivity_data = perform_sensitivity_analysis(processed_data)
     
+    # Combine all results into a single response
     result = {
         **processed_data,
         'scenarioData': scenario_data,
@@ -66,6 +75,7 @@ def api_process_data():
     session['data'] = result
     return jsonify(result)
 
+# API route to export data in various formats
 @app.route('/api/export_data', methods=['POST'])
 def api_export_data():
     data = request.json
@@ -82,6 +92,7 @@ def api_export_data():
         logging.error(f"Error exporting data: {str(e)}")
         return jsonify({'error': 'An error occurred while exporting data'}), 500
 
+# API route to handle LLM queries
 @app.route('/api/llm_query', methods=['POST'])
 def api_llm_query():
     query = request.json.get('query') if request.json else None
@@ -95,6 +106,7 @@ def api_llm_query():
         logging.error(f"Error in LLM query: {str(e)}")
         return jsonify({'error': 'An error occurred while processing your query.'}), 500
 
+# API route to save session data
 @app.route('/api/save_session', methods=['POST'])
 def api_save_session():
     session_data = request.json
@@ -104,6 +116,7 @@ def api_save_session():
     session_id = db.save_session(session_data)
     return jsonify({'session_id': session_id})
 
+# API route to load session data
 @app.route('/api/load_session/<session_id>', methods=['GET'])
 def api_load_session(session_id):
     session_data = db.load_session(session_id)
@@ -111,6 +124,7 @@ def api_load_session(session_id):
         return jsonify({'error': 'Session not found'}), 404
     return jsonify(session_data)
 
+# Route to generate a report based on processed data
 @app.route('/generate_report', methods=['POST'])
 def generate_report():
     data = request.json or session.get('data', {})
@@ -127,6 +141,7 @@ def generate_report():
     current_year = datetime.now().year
     return render_template('report.html', report_data=report_data, current_year=current_year)
 
+# API route for advanced analytics
 @app.route('/api/advanced_analytics', methods=['POST'])
 def api_advanced_analytics():
     data = request.json or session.get('data', {})
@@ -142,6 +157,7 @@ def api_advanced_analytics():
     
     return jsonify(result)
 
+# API route to update scenario data
 @app.route('/api/update_scenario', methods=['POST'])
 def api_update_scenario():
     try:
@@ -165,6 +181,7 @@ def api_update_scenario():
         logging.error(f"Error updating scenario: {str(e)}")
         return jsonify({'error': 'An error occurred while updating the scenario'}), 500
 
+# API route to update sensitivity analysis
 @app.route('/api/update_sensitivity', methods=['POST'])
 def api_update_sensitivity():
     try:
@@ -199,17 +216,17 @@ def api_update_sensitivity():
         logging.error(traceback.format_exc())
         return jsonify({'error': 'An unexpected error occurred', 'errorType': str(e.__class__.__name__)}), 500
 
-# Add these new imports
+# Import additional utilities for new features
 from utils.nlg import generate_chart_summary
 from utils.scenario_comparison import compare_scenarios
 
-# Add this new route
+# Route for the about page
 @app.route('/about')
 def about():
     current_year = datetime.now().year
     return render_template('about.html', current_year=current_year)
 
-# Add these new routes
+# API route to generate summary of chart data
 @app.route('/api/generate_summary', methods=['POST'])
 def api_generate_summary():
     try:
@@ -223,6 +240,7 @@ def api_generate_summary():
         logging.error(f"Error generating summary: {str(e)}")
         return jsonify({'error': 'An error occurred while generating the summary'}), 500
 
+# API route to compare scenarios
 @app.route('/api/compare_scenarios', methods=['POST'])
 def api_compare_scenarios():
     try:
@@ -236,5 +254,6 @@ def api_compare_scenarios():
         logging.error(f"Error comparing scenarios: {str(e)}")
         return jsonify({'error': 'An error occurred while comparing scenarios'}), 500
 
+# Run the Flask app if this script is executed directly
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
