@@ -1,38 +1,15 @@
-<header class="bg-white dark:bg-gray-800 shadow-md">
+<header class="bg-white shadow-md">
     <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-        <a href="/" class="text-2xl font-bold text-primary dark:text-white flex items-center">
-            <svg class="h-8 w-8 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 2a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm-1-5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd" />
-            </svg>
+        <a href="/" class="text-2xl font-bold text-primary flex items-center">
+            <img src="{{ url_for('static', filename='img/herologo.jpg') }}" alt="Logo" class="h-8 w-8 mr-2 rounded">
             Climate Econ Model
         </a>
         <nav class="flex items-center">
             <ul class="flex space-x-6">
-                <li><a href="/" class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-white transition duration-300">Home</a></li>
-                <li><a href="/dashboard" class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-white transition duration-300">Dashboard</a></li>
-                <li><a href="/about" class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-white transition duration-300">About</a></li>
+                <li><a href="/" class="text-gray-600 hover:text-primary transition duration-300">Home</a></li>
+                <li><a href="/dashboard" class="text-gray-600 hover:text-primary transition duration-300">Dashboard</a></li>
+                <li><a href="/about" class="text-gray-600 hover:text-primary transition duration-300">About</a></li>
             </ul>
-            <button id="darkModeToggle" class="ml-6 text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-white transition duration-300">
-                <i class="fas fa-moon"></i>
-            </button>
         </nav>
     </div>
 </header>
-
-<script>
-    const darkModeToggle = document.getElementById('darkModeToggle');
-    const html = document.documentElement;
-
-    darkModeToggle.addEventListener('click', () => {
-        html.classList.toggle('dark');
-        const isDarkMode = html.classList.contains('dark');
-        localStorage.setItem('darkMode', isDarkMode);
-        darkModeToggle.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-    });
-
-    // Check for saved dark mode preference
-    if (localStorage.getItem('darkMode') === 'true') {
-        html.classList.add('dark');
-        darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-    }
-</script>

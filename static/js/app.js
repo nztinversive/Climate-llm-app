@@ -2,27 +2,16 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM content loaded, setting up event listeners');
 
     const elements = {
-        importBtn: document.getElementById('importBtn'),
-        exportBtn: document.getElementById('exportBtn'),
-        fileInput: document.getElementById('fileInput'),
         generateReportBtn: document.getElementById('generateReportBtn'),
         runAdvancedAnalyticsBtn: document.getElementById('runAdvancedAnalyticsBtn'),
         scenarioSelect: document.getElementById('scenarioSelect'),
         sensitivitySlider: document.getElementById('sensitivitySlider'),
         generateSummaryBtn: document.getElementById('generateSummaryBtn'),
-        compareScenarioBtn: document.getElementById('compareScenarioBtn')
+        compareScenarioBtn: document.getElementById('compareScenarioBtn'),
+        loading: document.getElementById('loading')
     };
 
     // Check if elements exist before adding event listeners
-    if (elements.importBtn && elements.fileInput) {
-        elements.importBtn.addEventListener('click', () => elements.fileInput.click());
-        elements.fileInput.addEventListener('change', importData);
-    }
-
-    if (elements.exportBtn) {
-        elements.exportBtn.addEventListener('click', exportData);
-    }
-
     if (elements.generateReportBtn) {
         elements.generateReportBtn.addEventListener('click', generateReport);
     }
@@ -48,16 +37,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     initializeApplication();
+
+    // Function definitions
+    function showLoading() {
+        if (elements.loading) {
+            elements.loading.style.display = 'flex';
+        }
+    }
+
+    function hideLoading() {
+        if (elements.loading) {
+            elements.loading.style.display = 'none';
+        }
+    }
+
+    // Wrap all fetch calls with showLoading and hideLoading
+    const originalFetch = window.fetch;
+    window.fetch = function() {
+        showLoading();
+        return originalFetch.apply(this, arguments).then(response => {
+            hideLoading();
+            return response;
+        }).catch(error => {
+            hideLoading();
+            throw error;
+        });
+    };
 });
 
 function initializeApplication() {
     console.log('Initializing application');
-    try {
-        initCharts();
-    } catch (error) {
-        console.error('Error initializing charts:', error);
-        showErrorMessage('Error initializing charts. Please try refreshing the page.');
-    }
+    initCharts();
 }
 
 function loadDefaultData() {
@@ -277,3 +287,24 @@ function handleSensitivityChange(event) {
     console.log('Sensitivity changed to:', sensitivityValue);
     updateSensitivityChart(sensitivityValue);
 }
+
+function showLoading() {
+    document.getElementById('loading').style.display = 'flex';
+}
+
+function hideLoading() {
+    document.getElementById('loading').style.display = 'none';
+}
+
+// Wrap all fetch calls with showLoading and hideLoading
+const originalFetch = window.fetch;
+window.fetch = function() {
+    showLoading();
+    return originalFetch.apply(this, arguments).then(response => {
+        hideLoading();
+        return response;
+    }).catch(error => {
+        hideLoading();
+        throw error;
+    });
+};

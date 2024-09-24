@@ -22,15 +22,66 @@
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="icon" type="image/jpeg" href="{{ url_for('static', filename='img/herologo.jpg') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@8.3.1/dist/css/shepherd.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/shepherd.js@8.3.1/dist/js/shepherd.min.js"></script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        .loading-spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body class="bg-background text-text">
     {% include 'components/header.html' %}
 
-    <main class="container mx-auto mt-8 p-4">
+    <div id="loading" class="loading" style="display: none;">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <main class="container mx-auto mt-8 p-4 fade-in">
         <h1 class="text-4xl font-bold mb-8 text-center text-primary">Climate Economic Modeling Tool</h1>
         
+        <!-- New Guide Section -->
+        <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-8" role="alert">
+            <h2 class="font-bold text-lg mb-2">Quick Guide</h2>
+            <ol class="list-decimal list-inside">
+                <li>Start by selecting a scenario from the dropdown menu</li>
+                <li>Adjust the sensitivity slider to see how it affects the economic impact</li>
+                <li>Use the AI query box to ask specific questions about the data</li>
+                <li>Generate a summary or compare scenarios using the buttons provided</li>
+                <li>Explore the various charts to visualize the data</li>
+            </ol>
+        </div>
+
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Left Column -->
             <div class="lg:col-span-1 space-y-8">
@@ -134,5 +185,58 @@
     <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
     <script src="{{ url_for('static', filename='js/llm.js') }}"></script>
+    <script>
+        const tour = new Shepherd.Tour({
+            defaultStepOptions: {
+                cancelIcon: {
+                    enabled: true
+                },
+                classes: 'shadow-md bg-purple-100',
+                scrollTo: { behavior: 'smooth', block: 'center' }
+            }
+        });
+
+        tour.addStep({
+            id: 'welcome',
+            text: 'Welcome to the Climate Economic Modeling Tool! Let\'s take a quick tour.',
+            attachTo: {
+                element: '#welcomeMessage',
+                on: 'bottom'
+            },
+            buttons: [
+                {
+                    text: 'Next',
+                    action: tour.next
+                }
+            ]
+        });
+
+        // Add more steps for each section of your dashboard
+
+        document.getElementById('startTour').addEventListener('click', () => {
+            tour.start();
+        });
+
+        function showLoading() {
+            document.getElementById('loading').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        // Wrap all fetch calls with showLoading and hideLoading
+        const originalFetch = window.fetch;
+        window.fetch = function() {
+            showLoading();
+            return originalFetch.apply(this, arguments).then(response => {
+                hideLoading();
+                return response;
+            }).catch(error => {
+                hideLoading();
+                throw error;
+            });
+        };
+    </script>
 </body>
 </html>

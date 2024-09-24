@@ -2,7 +2,12 @@ let temperatureChart, economicChart, riskChart, scenarioChart, sensitivityChart;
 
 function initCharts() {
     console.log('Initializing charts');
-    loadDefaultData();
+    try {
+        loadDefaultData();
+    } catch (error) {
+        console.error('Error initializing charts:', error);
+        showErrorMessage('Error initializing charts. Please try refreshing the page.');
+    }
 }
 
 function loadDefaultData() {
@@ -64,10 +69,17 @@ function createOrUpdateChart(chartId, createChartFunction) {
 function createTemperatureChart(data) {
     console.log('Creating Temperature Chart with data:', JSON.stringify(data, null, 2));
     if (!data || !Array.isArray(data) || data.length === 0) {
-        throw new Error('Invalid temperature data');
+        console.error('Invalid temperature data');
+        return;
     }
     
-    const ctx = document.getElementById('temperatureChartCanvas').getContext('2d');
+    const canvas = document.getElementById('temperatureChartCanvas');
+    if (!canvas) {
+        console.error('Temperature chart canvas not found');
+        return;
+    }
+    
+    const ctx = canvas.getContext('2d');
     temperatureChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -93,110 +105,170 @@ function createTemperatureChart(data) {
 
 function createEconomicChart(data) {
     console.log('Creating Economic Chart');
-    const ctx = document.getElementById('economicChartCanvas').getContext('2d');
-    economicChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: data.map(d => d.year),
-            datasets: [{
-                label: 'GDP Impact',
-                data: data.map(d => d.gdp),
-                backgroundColor: 'rgba(75, 192, 192, 0.6)'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true
+    const canvas = document.getElementById('economicChartCanvas');
+    if (!canvas) {
+        console.error('Economic chart canvas not found');
+        return;
+    }
+
+    try {
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+            console.error('Unable to get 2D context for economic chart');
+            return;
+        }
+
+        economicChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.map(d => d.year),
+                datasets: [{
+                    label: 'GDP Impact',
+                    data: data.map(d => d.gdp),
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
                 }
             }
-        }
-    });
+        });
+    } catch (error) {
+        console.error('Error creating economic chart:', error);
+    }
 }
 
 function createRiskChart(data) {
     console.log('Creating Risk Chart');
-    const ctx = document.getElementById('riskChartCanvas').getContext('2d');
-    riskChart = new Chart(ctx, {
-        type: 'radar',
-        data: {
-            labels: ['Mean Temperature', 'VaR 95', 'Max Temperature'],
-            datasets: [{
-                label: 'Risk Metrics',
-                data: [data.mean_temperature, data.var_95, data.max_temperature],
-                fill: true,
-                backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                borderColor: 'rgb(255, 99, 132)',
-                pointBackgroundColor: 'rgb(255, 99, 132)',
-                pointBorderColor: '#fff',
-                pointHoverBackgroundColor: '#fff',
-                pointHoverBorderColor: 'rgb(255, 99, 132)'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false
+    const canvas = document.getElementById('riskChartCanvas');
+    if (!canvas) {
+        console.error('Risk chart canvas not found');
+        return;
+    }
+
+    try {
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+            console.error('Unable to get 2D context for risk chart');
+            return;
         }
-    });
+
+        riskChart = new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: ['Mean Temperature', 'VaR 95', 'Max Temperature'],
+                datasets: [{
+                    label: 'Risk Metrics',
+                    data: [data.mean_temperature, data.var_95, data.max_temperature],
+                    fill: true,
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgb(255, 99, 132)',
+                    pointBackgroundColor: 'rgb(255, 99, 132)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgb(255, 99, 132)'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    } catch (error) {
+        console.error('Error creating risk chart:', error);
+    }
 }
 
 function createScenarioChart(data) {
     console.log('Creating Scenario Chart');
-    const ctx = document.getElementById('scenarioChartCanvas').getContext('2d');
-    const scenarios = Object.keys(data);
-    scenarioChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: data[scenarios[0]].map(d => d.year),
-            datasets: scenarios.map(scenario => ({
-                label: scenario,
-                data: data[scenario].map(d => d.temperature),
-                borderColor: getScenarioColor(scenario),
-                fill: false
-            }))
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: false
+    const canvas = document.getElementById('scenarioChartCanvas');
+    if (!canvas) {
+        console.error('Scenario chart canvas not found');
+        return;
+    }
+
+    try {
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+            console.error('Unable to get 2D context for scenario chart');
+            return;
+        }
+
+        const scenarios = Object.keys(data);
+        scenarioChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data[scenarios[0]].map(d => d.year),
+                datasets: scenarios.map(scenario => ({
+                    label: scenario,
+                    data: data[scenario].map(d => d.temperature),
+                    borderColor: getScenarioColor(scenario),
+                    fill: false
+                }))
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: false
+                    }
                 }
             }
-        }
-    });
+        });
+    } catch (error) {
+        console.error('Error creating scenario chart:', error);
+    }
 }
 
 function createSensitivityChart(data) {
     console.log('Creating Sensitivity Chart');
-    const ctx = document.getElementById('sensitivityChartCanvas').getContext('2d');
-    sensitivityChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: Object.keys(data),
-            datasets: [{
-                label: 'Sensitivity',
-                data: Object.values(data),
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.6)',
-                    'rgba(54, 162, 235, 0.6)',
-                    'rgba(255, 206, 86, 0.6)',
-                    'rgba(75, 192, 192, 0.6)'
-                ]
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true
+    const canvas = document.getElementById('sensitivityChartCanvas');
+    if (!canvas) {
+        console.error('Sensitivity chart canvas not found');
+        return;
+    }
+
+    try {
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+            console.error('Unable to get 2D context for sensitivity chart');
+            return;
+        }
+
+        sensitivityChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(data),
+                datasets: [{
+                    label: 'Sensitivity',
+                    data: Object.values(data),
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.6)',
+                        'rgba(54, 162, 235, 0.6)',
+                        'rgba(255, 206, 86, 0.6)',
+                        'rgba(75, 192, 192, 0.6)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
                 }
             }
-        }
-    });
+        });
+    } catch (error) {
+        console.error('Error creating sensitivity chart:', error);
+    }
 }
 
 function createTable(data, headers, rowDataFunction = null) {
